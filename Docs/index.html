@@ -2,39 +2,21 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>CORE Documentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>CORE Documentation</title>
 
-<style type='text/css' media='all'>@import url('../userguide.css');</style>
-<link rel='stylesheet' type='text/css' media='all' href='userguide.css' />
+    <style type='text/css' media='all'>@import url('../userguide.css');</style>
+    <link rel='stylesheet' type='text/css' media='all' href='userguide.css' />
 
-<script type="text/javascript" src="nav/nav.js"></script>
-<script type="text/javascript" src="nav/prototype.lite.js"></script>
-<script type="text/javascript" src="nav/moo.fx.js"></script>
-<script type="text/javascript" src="nav/user_guide_menu.js"></script>
-
-<meta http-equiv='expires' content='-1' />
-<meta http-equiv= 'pragma' content='no-cache' />
-<meta name='robots' content='all' />
-<meta name='author' content='ExpressionEngine Dev Team' />
-<meta name='description' content='CodeIgniter User Guide' />
+    <meta http-equiv='expires' content='-1' />
+    <meta http-equiv= 'pragma' content='no-cache' />
+    <meta name='robots' content='all' />
+    <meta name='author' content='ExpressionEngine Dev Team' />
+    <meta name='description' content='CodeIgniter User Guide' />
 
 </head>
 <body>
 
-<!-- START NAVIGATION -->
-<div id="nav"><div id="nav_inner"><script type="text/javascript">create_menu('../');</script></div></div>
-<div id="nav2"><a name="top"></a><a href="javascript:void(0);" onclick="myHeight.toggle();"><img src="images/nav_toggle_darker.jpg" width="154" height="43" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
-<div id="masthead">
-<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
-<tr>
-<td><h1>CORE:: Userguide</h1></td>
-</tr>
-</table>
-</div>
-<!-- END NAVIGATION -->
-
-<!-- END BREADCRUMB -->
 
 <br clear="all" />
 
@@ -42,9 +24,9 @@
 <!-- START CONTENT -->
 <div id="content">
 
-<h1>Getting Started</h1>
+    <h1>Getting Started</h1>
 
-<p>The CORE:: libraries and helpers are designed to ensure that highly reusable code is can be quickly and easily accessed across multiple plugin implementations.</p>
+    <p>The CORE:: libraries and helpers are designed to ensure that highly reusable code is can be quickly and easily accessed across multiple plugin implementations.</p>
 
     <h2>Including the CORE</h2>
 
@@ -59,7 +41,7 @@
         include '../Core/bootstrap.php';
     </code>
 
-    <h2>Using CORE->Libraries</h2>
+    <h2>Using $CORE->Libraries</h2>
 
     <h3>Including:</h3>
     <p>Libraries in CORE act as collections of common functionality organized into classes.  To include a library for use by the CORE you can either define a single library or an array of libraries.</p>
@@ -80,6 +62,83 @@
         $Core->Encrypt();
     </code>
 
+    <h3>Libraries:</h3>
+    <table cellpadding="0" cellspacing="1" border="0" style="width:100%" class="tableborder">
+        <tr>
+            <th style="width:50%;">&nbsp;</th>
+            <th style="width:50%;">&nbsp;</th>
+        </tr>
+        <tr>
+            <td class="td">
+                <ul>
+                    <li>Librarby One</li>
+                </ul>
+            </td>
+            <td class="td">
+                <ul>
+                    <li>Library Two</li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Using $CORE->Helpers</h2>
+
+    <h3>Including:</h3>
+    <p>Helpers in CORE act as collections of common fuctions.  To include a helper for use by the CORE you can either define a single helper or an array of helpers.</p>
+
+    <code>
+        // Include single helper<br/>
+        $Core->Libraries('Helper1');<br/>
+        <br/><br/>
+        // Include array of helpers<br/>
+        $Core->Libraries(array('Helper1','Helper2'));<br/>
+    </code>
+
+    <h3>Usage:</h3>
+    <p>Once included into the CORE a helper can be accessed by simply calling the include function;</p>
+
+    <code>
+        // Calling the Helper1 function from the Core<br/>
+        helper1();
+    </code>
+
+    <h3>Helpers:</h3>
+    <table cellpadding="0" cellspacing="1" border="0" style="width:100%" class="tableborder">
+        <tr>
+            <th style="width:50%;">&nbsp;</th>
+            <th style="width:50%;">&nbsp;</th>
+        </tr>
+        <tr>
+            <td class="td">
+                <ul>
+                    <li>Helper One</li>
+                </ul>
+            </td>
+            <td class="td">
+                <ul>
+                    <li>Helper Two</li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Using $CORE->getCss & $CORE->getJs</h2>
+    <h3>The Core comes preloaded with Bootstrap 3.3.1 which can be included into your plugin using the <var>$Core->getCss()</var> and <var>$Core->getJs()</var> functions.</h3>
+
+    <code>
+require_once "../../redcap_connect.php";<br/>
+require_once '../Core/bootstrap.php';<br/><br/>
+
+require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';<br/><br/>
+
+$Core->getCss();<br/>
+        <br/>
+        < BODY CONTENT USING BOOTSTRAP HERE >
+        <br/><br/>
+$Core->getJs();<br/>
+        require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php';<br/>
+    </code>
 
 
 </div>

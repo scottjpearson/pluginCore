@@ -129,6 +129,31 @@ class Core
         return getcwd();
     }
 
+    private function getResourceURL()
+    {
+        $pageURL = 'http';
+        if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
+        $pageURL .= "://";
+        if ($_SERVER["SERVER_PORT"] != "80") {
+            $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"];
+        } else {
+            $pageURL .= $_SERVER["SERVER_NAME"];
+        }
+        return $pageURL;
+    }
+
+    public function getCss()
+    {
+        print '<link rel="stylesheet" href="'.Core::getResourceURL().'/plugins/Core/css/bootstrap.min.css">';
+        print '<link rel="stylesheet" href="'.Core::getResourceURL().'/plugins/Core/css/bootstrap-theme.min.css">';
+    }
+
+    public function getJs()
+    {
+        print '<script src="'.Core::getResourceURL().'/plugins/Core/js/bootstrap.min.js"></script>';
+    }
+
+
     public function test()
     {
         print __DIR__;
