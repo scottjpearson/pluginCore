@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CORE Documentation</title>
+
+<style type='text/css' media='all'>@import url('../userguide.css');</style>
+<link rel='stylesheet' type='text/css' media='all' href='userguide.css' />
+
+<script type="text/javascript" src="nav/nav.js"></script>
+<script type="text/javascript" src="nav/prototype.lite.js"></script>
+<script type="text/javascript" src="nav/moo.fx.js"></script>
+<script type="text/javascript" src="nav/user_guide_menu.js"></script>
+
+<meta http-equiv='expires' content='-1' />
+<meta http-equiv= 'pragma' content='no-cache' />
+<meta name='robots' content='all' />
+<meta name='author' content='ExpressionEngine Dev Team' />
+<meta name='description' content='CodeIgniter User Guide' />
+
+</head>
+<body>
+
+<!-- START NAVIGATION -->
+<div id="nav"><div id="nav_inner"><script type="text/javascript">create_menu('../');</script></div></div>
+<div id="nav2"><a name="top"></a><a href="javascript:void(0);" onclick="myHeight.toggle();"><img src="images/nav_toggle_darker.jpg" width="154" height="43" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>CORE:: Userguide</h1></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+<!-- END BREADCRUMB -->
+
+<br clear="all" />
+
+
+<!-- START CONTENT -->
+<div id="content">
+
+<h1>Getting Started</h1>
+
+<p>The CORE:: libraries and helpers are designed to ensure that highly reusable code is can be quickly and easily accessed across multiple plugin implementations.</p>
+
+    <h2>Including the CORE</h2>
+
+    <h3>GIT Checkout</h3>
+    <p>The CORE can be checked out from the Assembla GIT repository found at: </p>
+    <code>git@git.assembla.com:victr-dots.plugin_core.git</code>
+
+    <h3>Bootstrap</h3>
+    <p>Once you have pulled the CORE from GIT you need to include the bootstrap.php file into your project files.  Assuming the Core directory was on level above your codes root folder you could use the following code.</p>
+
+    <code>
+        include '../Core/bootstrap.php';
+    </code>
+
+    <h2>Using CORE->Libraries</h2>
+
+    <h3>Including:</h3>
+    <p>Libraries in CORE act as collections of common functionality organized into classes.  To include a library for use by the CORE you can either define a single library or an array of libraries.</p>
+
+    <code>
+        // Include single library<br/>
+        $Core->Libraries('Encrypt');<br/>
+        <br/><br/>
+        // Include array of libraries<br/>
+        $Core->Libraries(array('Encrypt','Project'));<br/>
+    </code>
+
+    <h3>Usage:</h3>
+    <p>Once included into the CORE a library can be accessed using its name as an object on the CORE;</p>
+
+    <code>
+        // Calling the Encrypt library from the Core<br/>
+        $Core->Encrypt();
+    </code>
+
+
+
+</div>
+<!-- END CONTENT -->
+
+
+
+<div id="footer">
+</div>
+
+</body>
+</html>
