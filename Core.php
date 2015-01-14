@@ -150,6 +150,7 @@ class Core
 
     public function getJs()
     {
+        print '<script src="'.Core::getResourceURL().'/plugins/Core/js/jquery.min.js"></script>';
         print '<script src="'.Core::getResourceURL().'/plugins/Core/js/bootstrap.min.js"></script>';
     }
 
