@@ -14,7 +14,7 @@ class Core
         {
             foreach( $libraries as $library )
             {
-                if(!Core::loadLibrary( $library ))
+                if(!Core_Core::loadLibrary( $library ))
                 {
                     $success = false;
                     $message = $library;
@@ -24,7 +24,7 @@ class Core
         ## Else if it's a string we need to just load the one.
         else if( is_string( $libraries ) )
         {
-            if( !Core::loadLibrary( $libraries ) )
+            if( !Core_Core::loadLibrary( $libraries ) )
             {
                 $success = false;
                 $message = $libraries;
@@ -55,9 +55,9 @@ class Core
         }
 
         ## See if the library exists locally in Plugin/Library
-        if( file_exists( Core::currentDirectory() . '/Libraries/' . $library . '.php' ) )
+        if( file_exists( Core_Core::currentDirectory() . '/Libraries/' . $library . '.php' ) )
         {
-            require_once( Core::currentDirectory() . '/Libraries/' . $library . '.php' );
+            require_once( Core_Core::currentDirectory() . '/Libraries/' . $library . '.php' );
             $this->$library = new $library();
             $return = true;
         }
@@ -76,7 +76,7 @@ class Core
         {
             foreach( $helpers as $helper )
             {
-                if(!Core::loadHelper( $helper ))
+                if(!Core_Core::loadHelper( $helper ))
                 {
                     $success = false;
                     $message = $helper;
@@ -86,7 +86,7 @@ class Core
         ## Else if it's a string we need to just load the one.
         else if( is_string( $helpers ) )
         {
-            if( !Core::loadHelper( $helpers ) )
+            if( !Core_Core::loadHelper( $helpers ) )
             {
                 $success = false;
                 $message = $helpers;
@@ -105,9 +105,9 @@ class Core
     {
         ## Check if Helper file exists locally first since that should
         ## override the Core/Helpers one.
-        if( file_exists( Core::currentDirectory() . '/Helpers/' . $helper . '.php' ) )
+        if( file_exists( Core_Core::currentDirectory() . '/Helpers/' . $helper . '.php' ) )
         {
-            require_once( Core::currentDirectory() . '/Helpers/' . $helper . '.php' );
+            require_once( Core_Core::currentDirectory() . '/Helpers/' . $helper . '.php' );
             return true;
         }
         ## If the Helper file did not exist in Core/Helpers then we need to look
@@ -144,14 +144,14 @@ class Core
 
     public function getCss()
     {
-        print '<link rel="stylesheet" href="'.Core::getResourceURL().'/plugins/Core/css/bootstrap.min.css">';
-        print '<link rel="stylesheet" href="'.Core::getResourceURL().'/plugins/Core/css/bootstrap-theme.min.css">';
+        print '<link rel="stylesheet" href="'.Core_Core::getResourceURL().'/plugins/Core/css/bootstrap.min.css">';
+        print '<link rel="stylesheet" href="'.Core_Core::getResourceURL().'/plugins/Core/css/bootstrap-theme.min.css">';
     }
 
     public function getJs()
     {
-        print '<script src="'.Core::getResourceURL().'/plugins/Core/js/jquery.min.js"></script>';
-        print '<script src="'.Core::getResourceURL().'/plugins/Core/js/bootstrap.min.js"></script>';
+        print '<script src="'.Core_Core::getResourceURL().'/plugins/Core/js/jquery.min.js"></script>';
+        print '<script src="'.Core_Core::getResourceURL().'/plugins/Core/js/bootstrap.min.js"></script>';
     }
 
 
