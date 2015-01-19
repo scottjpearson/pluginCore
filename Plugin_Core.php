@@ -2,6 +2,7 @@
 
 class Plugin_Core
 {
+	private $includedLibraries = array();
 
     public function Libraries( $libraries = array() )
     {
@@ -14,6 +15,9 @@ class Plugin_Core
         {
             foreach( $libraries as $library )
             {
+				if(in_array($library,$this->includedLibraries)) {
+					exit;
+				}
                 if(!self::loadLibrary( $library ))
                 {
                     $success = false;
@@ -24,6 +28,9 @@ class Plugin_Core
         ## Else if it's a string we need to just load the one.
         else if( is_string( $libraries ) )
         {
+			if(in_array($libraries,$this->includedLibraries)) {
+				exit;
+			}
             if( !self::loadLibrary( $libraries ) )
             {
                 $success = false;
@@ -43,24 +50,20 @@ class Plugin_Core
     {
         $return = false;
 
-        ## We want to load the Core_ library first since the local one
-        ## might extend it.
-        if( file_exists( __DIR__ . '/Libraries/Core_' . $library . '.php' ) )
-        {
-            require_once(__DIR__ . '/Libraries/Core_' . $library . '.php' );
-            $library = 'Core_' . $library;
+		## See if the library exists locally in Plugin/Library
+		if( file_exists( self::currentDirectory() . '/Libraries/' . $library . '.php' ) )
+		{
+			require_once( self::currentDirectory() . '/Libraries/' . $library . '.php' );
+			$this->includedLibraries[] = $library;
 
-			self::$library = new $library();
-            //$this->$library = new $library_file();
-            $return = true;
-        }
-
-        ## See if the library exists locally in Plugin/Library
-        if( file_exists( self::currentDirectory() . '/Libraries/' . $library . '.php' ) )
+			$return = true;
+		}
+        ## Then check if the core library exists, if the local doesn't
+        else if( file_exists( __DIR__ . '/Libraries/' . $library . '.php' ) )
         {
-            require_once( self::currentDirectory() . '/Libraries/' . $library . '.php' );
-			self::$library = new $library();
-            //$this->$library = new $library();
+            require_once(__DIR__ . '/Libraries/' . $library . '.php' );
+			$this->includedLibraries[] = $library;
+
             $return = true;
         }
 
@@ -78,7 +81,7 @@ class Plugin_Core
         {
             foreach( $helpers as $helper )
             {
-                if(!Core_Core::loadHelper( $helper ))
+                if(!self::loadHelper( $helper ))
                 {
                     $success = false;
                     $message = $helper;
