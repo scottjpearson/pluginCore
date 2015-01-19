@@ -1,5 +1,6 @@
 <?php
 /** Author: Jon Scherdin */
+namespace Plugin;
 
 class Collection extends \ArrayObject {
 	public function add($obj) {

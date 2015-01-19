@@ -1,5 +1,6 @@
 <?php
 /** Author: Jon Scherdin */
+namespace Plugin;
 
 class RedcapLog {
 	private static $tableName = "redcap_log_event";

@@ -1,5 +1,6 @@
 <?php
 /** Author: Jon Scherdin */
+namespace Plugin;
 
 class Proj {
 	# name of db table

@@ -16,7 +16,7 @@ class Plugin_Core
             foreach( $libraries as $library )
             {
 				if(in_array($library,$this->includedLibraries)) {
-					exit;
+					return;
 				}
                 if(!self::loadLibrary( $library ))
                 {
@@ -29,7 +29,7 @@ class Plugin_Core
         else if( is_string( $libraries ) )
         {
 			if(in_array($libraries,$this->includedLibraries)) {
-				exit;
+				return;
 			}
             if( !self::loadLibrary( $libraries ) )
             {
@@ -144,19 +144,20 @@ class Plugin_Core
         } else {
             $pageURL .= $_SERVER["SERVER_NAME"];
         }
+		$pageURL .= substr(__DIR__,strlen($_SERVER["DOCUMENT_ROOT"]));
         return $pageURL;
     }
 
     public function getCss()
     {
-        print '<link rel="stylesheet" href="'.self::getResourceURL().'/plugins/Core/css/bootstrap.min.css">';
-        print '<link rel="stylesheet" href="'.self::getResourceURL().'/plugins/Core/css/bootstrap-theme.min.css">';
+        print '<link rel="stylesheet" href="'.self::getResourceURL().'/css/bootstrap.min.css">';
+        print '<link rel="stylesheet" href="'.self::getResourceURL().'/css/bootstrap-theme.min.css">';
     }
 
     public function getJs()
     {
-        print '<script src="'.self::getResourceURL().'/plugins/Core/js/jquery.min.js"></script>';
-        print '<script src="'.self::getResourceURL().'/plugins/Core/js/bootstrap.min.js"></script>';
+        print '<script src="'.self::getResourceURL().'/js/jquery.min.js"></script>';
+        print '<script src="'.self::getResourceURL().'/js/bootstrap.min.js"></script>';
     }
 
 

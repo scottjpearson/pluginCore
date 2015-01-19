@@ -1,5 +1,6 @@
 <?php
 /** Author: Jon Scherdin */
+namespace Plugin;
 
 class Event {
 	private static $tableName = "redcap_events_metadata";

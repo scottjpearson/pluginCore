@@ -1,5 +1,6 @@
 <?php
 /** Author: Kyle McGuffin */
+namespace Plugin;
 
 # Class for looking up REDCap project IDs and metadata
 class Project {

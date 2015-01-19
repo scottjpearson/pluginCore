@@ -5,6 +5,7 @@
  * Date: 1/15/2015
  * Time: 12:48 PM
  */
+namespace Plugin;
 
 include_once("Project.php");
 
@@ -79,12 +80,12 @@ class User_Rights {
 					WHERE m.project_id = ".$project->getProjectId();
 
 			$result = db_query($sql);
-			$setSQL = "data_entry = '";
+			$newRights['data_entry'] = "'";
 
 			while($row = db_fetch_assoc($result)) {
-				$setSQL .= "[{$row['form_name']},{$newRights['form-all-rights']}]";
+				$newRights['data_entry'] .= "[{$row['form_name']},{$newRights['form-all-rights']}]";
 			}
-			$setSQL .= "'";
+			$newRights['data_entry'] .= "'";
 		}
 
 		foreach(get_object_vars(new User_Rights(null,null)) as $fieldName => $value) {
@@ -102,42 +103,50 @@ class User_Rights {
 		return $setSQL;
 	}
 	public static function printRightsPage(Project $project) {
-		echo "User Or Role:
-		<select name='roleOrUser' onchange='$(\"#userSelect\").hide(); $(\"#roleSelect\").hide(); ".
+		echo "<form action='user_rights_save.php' method='post'>";
+
+		echo "<table>
+		<tr><td>User Or Role:</td>
+		<td><select name='roleOrUser' onchange='$(\"#userSelect\").hide(); $(\"#roleSelect\").hide(); ".
 			"if($(this).val() == \"Role\") { $(\"#roleSelect\").show() } else { $(\"#userSelect\").show() }'>
 			<option value='Role'>Role</option>
 			<option value='User_Rights'>User</option>
-		</select><br />
-		<select name='user' style='display:none' id='userSelect' >";
-		$userList = Core::User_Rights->getUsersByProject($project);
+		</select></td></tr>
+		<tr id='userSelect'><td>User:</td><td><select name='user' >";
+		$userList = User_Rights::getUsersByProject($project);
 
 		foreach($userList as $username) {
 			echo "<option value='$username'>$username</option>";
 		}
-		echo "</select>
-		<select name='role' id='roleSelect' >";
-		$roleList = Core::Role->getRolesByProject($project);
+		echo "</select></td></tr>
+		<tr id='roleSelect'><td>Role:</td><td><select name='role' >";
+		$roleList = Role::getRolesByProject($project);
 
 		foreach($roleList as $rolename) {
 			echo "<option value='$rolename'>$rolename</option>";
 		}
-		echo "</select>
-		<div style='height:500px;overflow:scroll'>";
+		echo "</select></td></tr></table>
+		<div id='user_rights_form' style='height:500px;overflow:scroll'>";
 
 		$protocol = $_SERVER['HTTPS'] == '' ? 'http://' : 'https://';
 		$folder = $protocol . $_SERVER['HTTP_HOST'];
-		$url = $folder.APP_PATH_WEBROOT."/UserRights/edit_user.php?pid=".$project->getProjectId();
+		$url = $folder.APP_PATH_WEBROOT."/UserRights/edit_user.php?pid=".$project->getProjectId(); # Path to
 		$data = file_get_contents($url);
 		$formStart = strpos($data,"<form");
 		$formEnd = strpos($data,">",$formStart);
 		$data = str_replace(substr($data,$formStart,$formEnd - $formStart + 1),"",$data);
+		while($hiddenInputStart = strpos($data,"<input type='hidden'")) {
+			$hiddenInputEnd = strpos($data,">",$hiddenInputStart);
+			$data = str_replace(substr($data,$hiddenInputStart,$hiddenInputEnd - $hiddenInputStart + 1),"",$data);
+		}
 		$data = str_replace("</form>","",$data);
-		echo "<form id='user_rights_form' action='user_rights_save.php' method='post'>";
+
 		echo $data;
-		echo "<input type='submit' value='Submit' /></form>";
 		echo "</div>";
+		echo "<input type='submit' value='Submit' /></form>";
 		echo "<script type='text/javascript'>
 		\$(document).ready(function() {
+			\$('select[name=\"roleOrUser\"]').change();
 			\$('#user_rights_form').find('div').each(function(num){ if(num < 2) $(this).remove(); });
 			\$('#user_rights_form').find('.hidden').hide();
 			\$('#user_rights_form').find('input[type=\"checkbox\"], input[type=\"radio\"]').attr('checked', false);

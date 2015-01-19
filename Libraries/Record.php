@@ -1,5 +1,6 @@
 <?php
 /** Author: Kyle McGuffin */
+namespace Plugin;
 
 include_once("Project.php");
 

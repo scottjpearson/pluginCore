@@ -5,6 +5,7 @@
  * Date: 1/15/2015
  * Time: 12:47 PM
  */
+namespace Plugin;
 
 include_once("Project.php");
 include_once("User_Rights.php");

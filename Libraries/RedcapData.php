@@ -1,5 +1,6 @@
 <?php
 /** Author: Jon Scherdin */
+namespace Plugin;
 
 class RedcapData {
 	private static $tableName = "redcap_data";

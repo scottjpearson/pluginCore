@@ -1,5 +1,6 @@
 <?php
 /** Author: Jon Scherdin */
+namespace Plugin;
 
 class Arm {
 	private static $tableName = "redcap_events_arms";

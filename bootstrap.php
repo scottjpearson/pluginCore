@@ -1,7 +1,7 @@
 <?PHP
 
 ## Include the Core object
-include 'Core.php';
+include 'Plugin_Core.php';
 $Core = new Plugin_Core();
 
 

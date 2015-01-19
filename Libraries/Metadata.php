@@ -1,5 +1,6 @@
 <?php
 /** Author: Jon Scherdin */
+namespace Plugin;
 
 class Metadata {
 	private static $tableName = "redcap_metadata";
