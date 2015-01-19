@@ -1,7 +1,7 @@
 <?php
 /** Author: Jon Scherdin */
 
-class Core_RedcapLog {
+class RedcapLog {
 	private static $tableName = "redcap_log_event";
 
 	const UPDATE = 'UPDATE';

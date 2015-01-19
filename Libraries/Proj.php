@@ -1,7 +1,7 @@
 <?php
 /** Author: Jon Scherdin */
 
-class Core_Proj {
+class Proj {
 	# name of db table
 	private static $tableName = "redcap_projects";
 
@@ -29,13 +29,13 @@ class Core_Proj {
 	/* @var Metadata[] */
 	private $metadata;
 
-	/* @var Core_Event[] */
+	/* @var Event[] */
 	private $events;
 
 	/* @var Arm[] */
 	private $arms;
 
-	/* @var Core_Record[] */
+	/* @var Record[] */
 	private $records;
 
 	private $forms;
@@ -182,10 +182,10 @@ class Core_Proj {
 	}
 
 	/**
-	 * @return Core_Event[]
+	 * @return Event[]
 	 */
 	public function getEvents() {
-		if ($this->events == null) { $this->events = Core_Event::getItemsByProject($this); }
+		if ($this->events == null) { $this->events = Event::getItemsByProject($this); }
 		return $this->events;
 	}
 
@@ -239,7 +239,7 @@ class Core_Proj {
 		if(!db_query($sql)) throw new Exception("Error Inserting Auto ID ".$sql,self::SQL_ERROR);
 		$logSql = $sql;
 
-		Core_Core::log_rc_event($this->project_id,$logSql,"redcap_data","INSERT",$newId,"$fieldName = '$newId'","Create Record","0","[PLUGIN]");
+		Core::log_rc_event($this->project_id,$logSql,"redcap_data","INSERT",$newId,"$fieldName = '$newId'","Create Record","0","[PLUGIN]");
 
 		# Return new auto id value
 		return $newId;

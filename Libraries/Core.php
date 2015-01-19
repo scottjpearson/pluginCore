@@ -1,7 +1,7 @@
 <?php
 /** Author: Jon Scherdin */
 
-class Core_Core {
+class Core {
 	# global error logging function
 	public static function logEvent($text, $e) {
 		# Configure logging

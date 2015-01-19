@@ -1,7 +1,7 @@
 <?php
 /** Author: Jon Scherdin */
 
-class Core_Metadata {
+class Metadata {
 	private static $tableName = "redcap_metadata";
 
 	private $project_id;
@@ -455,15 +455,15 @@ class Core_Metadata {
 	function __construct() { }
 
 	/**
-	 * @return Core_Metadata[]
+	 * @return Metadata[]
 	 */
-	public static function getItemsByProject(Core_Proj $project) {
+	public static function getItemsByProject(Proj $project) {
 		$sql = "SELECT *
 				FROM ".self::$tableName."
 				WHERE project_id = {$project->getProjectId()}
 				ORDER BY field_order";
 		$result = db_query($sql);
-		$col = new Core_Collection();
+		$col = new Collection();
 		while ($row = db_fetch_assoc($result)) {
 			$item = new self();
 			foreach($row as $column => $value) {

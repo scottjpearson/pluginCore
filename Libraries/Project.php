@@ -2,7 +2,7 @@
 /** Author: Kyle McGuffin */
 
 # Class for looking up REDCap project IDs and metadata
-class Core_Project {
+class Project {
 	# Error Codes
 	const NO_RECORD_ERROR = 1;
 	const MULTIPLE_RECORD_ERROR = 2;
@@ -153,7 +153,7 @@ class Core_Project {
 			$result = db_query($sql);
 		}
 
-		Core_Core::log_rc_event($this->projectId,$logSql,"redcap_data","INSERT",$newIdDetails["record"],
+		Core::log_rc_event($this->projectId,$logSql,"redcap_data","INSERT",$newIdDetails["record"],
 				"{$newIdDetails["field_name"]} = '{$newIdDetails["record"]}'","Creating Record","0","[PLUGIN]");
 
 		// Return new auto id value

@@ -1,7 +1,7 @@
 <?php
 /** Author: Jon Scherdin */
 
-class Core_RedcapData {
+class RedcapData {
 	private static $tableName = "redcap_data";
 
 	const SQL_ERROR = 3;
@@ -167,7 +167,7 @@ class Core_RedcapData {
 		$logDescription = "";
 		$updateCount = 0;
 
-		/* @var $item Core_RedcapData */
+		/* @var $item RedcapData */
 		foreach($items as $item) {
 			$item->value = db_real_escape_string($item->value);
 

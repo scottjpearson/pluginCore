@@ -1,7 +1,7 @@
 <?php
 /** Author: Jon Scherdin */
 
-class Core_Arm {
+class Arm {
 	private static $tableName = "redcap_events_arms";
 
 	private $arm_id;
@@ -92,9 +92,9 @@ class Core_Arm {
 	}
 
 	/**
-	 * @return Core_Arm[]
+	 * @return Arm[]
 	 */
-	public static function getItemsByProject(Core_Proj $project) {
+	public static function getItemsByProject(Proj $project) {
 		$sql = "SELECT *
 				FROM ".self::$tableName."
 				WHERE project_id = {$project->getProjectId()}

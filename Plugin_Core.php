@@ -1,6 +1,6 @@
 <?PHP
 
-class Core
+class Plugin_Core
 {
 
     public function Libraries( $libraries = array() )
@@ -48,9 +48,10 @@ class Core
         if( file_exists( __DIR__ . '/Libraries/Core_' . $library . '.php' ) )
         {
             require_once(__DIR__ . '/Libraries/Core_' . $library . '.php' );
-            $library_file = 'Core_' . $library;
+            $library = 'Core_' . $library;
 
-            $this->$library = new $library_file();
+			self::$library = new $library();
+            //$this->$library = new $library_file();
             $return = true;
         }
 
@@ -58,7 +59,8 @@ class Core
         if( file_exists( self::currentDirectory() . '/Libraries/' . $library . '.php' ) )
         {
             require_once( self::currentDirectory() . '/Libraries/' . $library . '.php' );
-            $this->$library = new $library();
+			self::$library = new $library();
+            //$this->$library = new $library();
             $return = true;
         }
 

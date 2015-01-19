@@ -1,7 +1,7 @@
 <?php
 /** Author: Jon Scherdin */
 
-class Core_Collection extends \ArrayObject {
+class Collection extends \ArrayObject {
 	public function add($obj) {
 		parent::append($obj);
 	}

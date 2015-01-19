@@ -1,10 +1,10 @@
 <?php
 /** Author: Kyle McGuffin */
 
-include_once("Core_Project.php");
+include_once("Project.php");
 
 # Class for looking up and editing a single record on a given project
-class Core_Record {
+class Record {
 	# Error codes
 	const NO_RECORD_ERROR = 1;
 	const MULTIPLE_RECORD_ERROR = 2;
@@ -166,7 +166,7 @@ class Core_Record {
 //				echo "$fieldName => $value \n";
 //			}
 //			echo "</pre><br /><br />";
-			Core_Core::log_rc_event($this->project->getProjectId(), $logSql, "redcap_data", $logType, $this->id, $logText, $logDescription, "0", "[PLUGIN]");
+			Core::log_rc_event($this->project->getProjectId(), $logSql, "redcap_data", $logType, $this->id, $logText, $logDescription, "0", "[PLUGIN]");
 		}
 
 		return $this;
@@ -302,7 +302,7 @@ class Core_Record {
 	# TODO: Determine whether all sub-classes should override this function (and therefore whether we should pass keys into this parent function)
 	# TODO: Or whether we should make this a generic constructor callable from all sub-classes
 	public static function createRecordFromId(Project $project, $id) {
-		$newRecord = new Core_Record($project,"","");
+		$newRecord = new Record($project,"","");
 		// $newRecord = new self($project,"","");
 		$newRecord->id = $id;
 

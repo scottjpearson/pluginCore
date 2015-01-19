@@ -1,7 +1,7 @@
 <?php
 /** Author: Jon Scherdin */
 
-class Core_Event {
+class Event {
 	private static $tableName = "redcap_events_metadata";
 
 	private $event_id;
@@ -146,16 +146,16 @@ class Core_Event {
 	}
 
 	/**
-	 * @return Core_Event[]
+	 * @return Event[]
 	 */
-	public static function getItemsByProject(Core_Proj $project) {
+	public static function getItemsByProject(Proj $project) {
 		$sql = "SELECT e.*
 				FROM ".self::$tableName." e, ".Arm::getTableName()." a
 				WHERE a.project_id = {$project->getProjectId()}
 					AND a.arm_id = e.arm_id
 				ORDER BY a.arm_num, e.day_offset";
 		$result = db_query($sql);
-		$col = new Core_Collection();
+		$col = new Collection();
 		while ($row = db_fetch_assoc($result)) {
 			$item = new self();
 			foreach($row as $column => $value) {
