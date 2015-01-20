@@ -49,13 +49,14 @@ class Plugin_Core
     private function loadLibrary( $library = '' )
     {
         $return = false;
+		$libaryNamespaceName = "\\Plugin\\$library";
 
 		## See if the library exists locally in Plugin/Library
 		if( file_exists( self::currentDirectory() . '/Libraries/' . $library . '.php' ) )
 		{
 			require_once( self::currentDirectory() . '/Libraries/' . $library . '.php' );
 			$this->includedLibraries[] = $library;
-			$this->$library = new $library();
+			$this->$library = new $libaryNamespaceName();
 
 			$return = true;
 		}
@@ -64,7 +65,7 @@ class Plugin_Core
         {
             require_once(__DIR__ . '/Libraries/' . $library . '.php' );
 			$this->includedLibraries[] = $library;
-			$this->$library = new $library();
+			$this->$library = new $libaryNamespaceName();
 
             $return = true;
         }
