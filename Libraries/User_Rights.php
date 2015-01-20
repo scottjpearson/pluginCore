@@ -130,7 +130,8 @@ class User_Rights {
 
 		$protocol = $_SERVER['HTTPS'] == '' ? 'http://' : 'https://';
 		$folder = $protocol . $_SERVER['HTTP_HOST'];
-		$url = $folder.APP_PATH_WEBROOT."/UserRights/edit_user.php?pid=".$project->getProjectId(); # Path to
+		$url = $folder.APP_PATH_WEBROOT."/UserRights/edit_user.php?pid=".$project->getProjectId()."&" . session_name() . "=" . session_id(); # Path to
+		//echo "URL: $url <br />";
 		$data = file_get_contents($url);
 		$formStart = strpos($data,"<form");
 		$formEnd = strpos($data,">",$formStart);
