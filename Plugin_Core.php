@@ -55,6 +55,7 @@ class Plugin_Core
 		{
 			require_once( self::currentDirectory() . '/Libraries/' . $library . '.php' );
 			$this->includedLibraries[] = $library;
+			$this->$library = new $library();
 
 			$return = true;
 		}
@@ -63,6 +64,7 @@ class Plugin_Core
         {
             require_once(__DIR__ . '/Libraries/' . $library . '.php' );
 			$this->includedLibraries[] = $library;
+			$this->$library = new $library();
 
             $return = true;
         }
