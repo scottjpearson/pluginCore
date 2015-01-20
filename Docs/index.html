@@ -59,7 +59,14 @@
 
     <code>
         // Calling the Encrypt library from the Core<br/>
-        $Core->Encrypt();
+        $encrypted = new $Core->Encrypt();
+    </code>
+
+    <p>The library can also be accessed directly</p>
+
+    <code>
+        // Calling the Encrypt library directly<br/>
+        $encrypted = new Encrypt();
     </code>
 
     <h3>Libraries:</h3>
@@ -138,6 +145,23 @@ $Core->getCss();<br/>
         <br/><br/>
 $Core->getJs();<br/>
         require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php';<br/>
+    </code>
+
+    <h2>Overriding CORE Libraries</h2>
+    <p>The CORE libraries can be overidden with local versions of those libraries.</p>
+
+    <h3>Local Location</h3>
+    <p>Local libraries are placed in the Libraries/ folder</p>
+    <p>Local helpers are placed in the Helpers/ folder</p>
+    <code>
+        // Include single library<br />
+        $Core->Libraries(array('Encrypt','Project'));<br /><br />
+
+        // If /local_dir/Libraries/Encrypt.php exists, this points to the runEncryption function in that class<br />
+        $Core->Encrypt->runEncryption();><br /><br />
+
+        // If /local_dir/Libraries/Project.php does not exist, this creates a new object from the /redcap/plugins/core/Libraries/Project.php file<br />
+        $myProject = new $Core->Project();
     </code>
 
 
