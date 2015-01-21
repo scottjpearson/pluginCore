@@ -182,6 +182,25 @@ class Project {
 		return $this->recordList;
 	}
 
+	public final function getRecords() {
+		$sql = "SELECT DISTINCT d.record
+				, d.field_name
+				, d.value
+				FROM redcap_data d
+				WHERE d.project_id = {$this->projectId}
+				ORDER BY d.record";
+
+		if(!($result = db_query($sql))) throw new Exception("Failed to lookup record list\n".db_error());
+
+		$results = array();
+		while( $row = db_fetch_assoc($result))
+		{
+			$results[] = $row;
+		}
+
+		return $results;
+	}
+
 	# Public function for fetching project ID and event ID from the database for a given project short code
 	public final static function getProjectAndEvent($projectShortCode) {
 		while(strlen($projectShortCode) > 0) {
