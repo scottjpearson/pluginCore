@@ -44,22 +44,11 @@ class Role {
 	}
 
 	public function updateRights($newRights) {
-		$setSQL = "";
-		foreach(get_object_vars($this) as $fieldName => $value) {
-			if(in_array($fieldName,array("project","username"))) continue;
+		if($this->roleId == 0) return false;
 
-			if(!isset($newRights[$fieldName]) || $newRights[$fieldName] == "") {
-				$this->$fieldName = 0;
-			}
-			else {
-				$this->$fieldName = $newRights[$fieldName];
-			}
-			$setSQL .= ($setSQL == "" ? "" : ",\n")."$fieldName = {$this->$fieldName}";
-		}
-
-		if($setSQL != "") {
+		if($this->project->getProjectId() != "") {
 			$sql = "UPDATE redcap_user_roles
-					SET $setSQL
+					SET ".User_Rights::getSetRightsSql($newRights,$this->project)."
 					WHERE project_id = " . $this->project->getProjectId() . "
 						AND role_id = '{$this->roleId}'";
 
@@ -73,7 +62,9 @@ class Role {
 		$sql = "SELECT DISTINCT r.role_id
 				FROM redcap_user_roles r
 				WHERE r.project_id = ".$project->getProjectId()."
-					AND r.rolename = '$roleName'";
+					AND r.role_name = '$roleName'";
+
+		echo "GET Role $sql";
 
 		return db_result(db_query($sql),0);
 	}

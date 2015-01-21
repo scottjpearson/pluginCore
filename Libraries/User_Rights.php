@@ -91,7 +91,7 @@ class User_Rights {
 		}
 
 		foreach(get_object_vars(new User_Rights(null,null)) as $fieldName => $value) {
-			if(in_array($fieldName,array("project","username"))) continue;
+			if(in_array($fieldName,array("project","username","roleId"))) continue;
 
 			if(!isset($newRights[$fieldName]) || $newRights[$fieldName] == "") {
 				$value = 0;
@@ -102,8 +102,13 @@ class User_Rights {
 			$setSQL .= ($setSQL == "" ? "" : ",\n")."$fieldName = $value";
 		}
 
+		if($setSQL == "") {
+			$setSQL = "project_id = project_id";
+		}
+
 		return $setSQL;
 	}
+
 	public static function printRightsPage(Project $project) {
 		echo "<form action='user_rights_save.php' method='post'>";
 
