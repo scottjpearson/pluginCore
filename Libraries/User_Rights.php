@@ -9,6 +9,8 @@ namespace Plugin;
 
 include_once("Project.php");
 
+use \Exception;
+
 # Class for looking up and editing a single user's rights on a project
 class User_Rights {
 	# Columns
@@ -132,7 +134,9 @@ class User_Rights {
 		$folder = $protocol . $_SERVER['HTTP_HOST'];
 		$url = $folder.APP_PATH_WEBROOT."/UserRights/edit_user.php?pid=".$project->getProjectId()."&" . session_name() . "=" . session_id(); # Path to
 		//echo "URL: $url <br />";
-		$data = file_get_contents($url);
+		$opts = array('http' => array('header'=> 'Cookie: ' . $_SERVER['HTTP_COOKIE']."\r\n"));
+		$context = stream_context_create($opts);
+		$data = file_get_contents($url,false,$context);
 		$formStart = strpos($data,"<form");
 		$formEnd = strpos($data,">",$formStart);
 		$data = str_replace(substr($data,$formStart,$formEnd - $formStart + 1),"",$data);

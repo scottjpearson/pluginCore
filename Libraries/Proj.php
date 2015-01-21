@@ -2,6 +2,8 @@
 /** Author: Jon Scherdin */
 namespace Plugin;
 
+use \Exception;
+
 class Proj {
 	# name of db table
 	private static $tableName = "redcap_projects";

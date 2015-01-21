@@ -2,6 +2,8 @@
 /** Author: Kyle McGuffin */
 namespace Plugin;
 
+use \Exception;
+
 include_once("Project.php");
 
 # Class for looking up and editing a single record on a given project

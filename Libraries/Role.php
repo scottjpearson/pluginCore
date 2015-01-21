@@ -10,6 +10,8 @@ namespace Plugin;
 include_once("Project.php");
 include_once("User_Rights.php");
 
+use \Exception;
+
 # Class for looking up and editing a single role on a project
 class Role {
 	# Columns
@@ -55,14 +57,16 @@ class Role {
 			$setSQL .= ($setSQL == "" ? "" : ",\n")."$fieldName = {$this->$fieldName}";
 		}
 
-		$sql = "UPDATE redcap_user_roles
-				SET $setSQL
-				WHERE project_id = ".$this->project->getProjectId()."
-					AND role_id = '{$this->roleId}'";
+		if($setSQL != "") {
+			$sql = "UPDATE redcap_user_roles
+					SET $setSQL
+					WHERE project_id = " . $this->project->getProjectId() . "
+						AND role_id = '{$this->roleId}'";
 
-		echo $sql;
+			echo $sql;
 
-		if(!db_query($sql)) throw new Exception("ERROR - ".db_error());
+			if (!db_query($sql)) throw new Exception("ERROR - " . db_error());
+		}
 	}
 
 	public static function getRoleId(Project $project, $roleName) {

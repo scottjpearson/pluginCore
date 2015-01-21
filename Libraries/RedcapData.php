@@ -2,6 +2,8 @@
 /** Author: Jon Scherdin */
 namespace Plugin;
 
+use \Exception;
+
 class RedcapData {
 	private static $tableName = "redcap_data";
 

@@ -2,6 +2,8 @@
 /** Author: Kyle McGuffin */
 namespace Plugin;
 
+use \Exception;
+
 # Class for looking up REDCap project IDs and metadata
 class Project {
 	# Error Codes
