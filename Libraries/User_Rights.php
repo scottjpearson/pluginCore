@@ -22,6 +22,7 @@ class User_Rights {
 	public $data_logging;
 	public $file_repository;
 	public $user_rights;
+	public $design;
 	public $data_access_groups;
 	public $reports;
 	public $calendar;
@@ -43,7 +44,7 @@ class User_Rights {
 					WHERE project_id = " . $this->project->getProjectId() . "
 						AND username = '{$this->username}'";
 
-			echo $sql;
+			//echo $sql;
 
 			if (!db_query($sql)) throw new Exception("ERROR - " . db_error());
 		}
@@ -105,12 +106,12 @@ class User_Rights {
 		if($setSQL == "") {
 			$setSQL = "project_id = project_id";
 		}
-
+//echo "SQL: $setSQL <br /><br />";
 		return $setSQL;
 	}
 
-	public static function printRightsPage(Project $project) {
-		echo "<form action='user_rights_save.php' method='post'>";
+	public static function printRightsPage(Project $project, $resultsUrl) {
+		echo "<form action='$resultsUrl' method='post'>";
 
 		echo "<table>
 		<tr><td>User Or Role:</td>
@@ -119,13 +120,13 @@ class User_Rights {
 			<option value='Role'>Role</option>
 			<option value='User_Rights'>User</option>
 		</select></td></tr>
-		<tr id='userSelect'><td>User:</td><td><select name='user' >";
+		<tr id='userSelect'><td>User:</td><td>";
 		$userList = User_Rights::getUsersByProject($project);
 
 		foreach($userList as $username) {
-			echo "<option value='$username'>$username</option>";
+			echo "<input type='checkbox' name='user[]' value='$username' />$username<br />";
 		}
-		echo "</select></td></tr>
+		echo "</td></tr>
 		<tr id='roleSelect'><td>Role:</td><td><select name='role' >";
 		$roleList = Role::getRolesByProject($project);
 
