@@ -44,6 +44,7 @@ class Role {
 	}
 
 	public function updateRights($newRights) {
+		//echo "{$this->roleId} => {$this->project->getProjectId()} <br />";
 		if($this->roleId == 0) return false;
 
 		if($this->project->getProjectId() != "") {
@@ -51,8 +52,6 @@ class Role {
 					SET ".User_Rights::getSetRightsSql($newRights,$this->project)."
 					WHERE project_id = " . $this->project->getProjectId() . "
 						AND role_id = '{$this->roleId}'";
-
-			echo $sql;
 
 			if (!db_query($sql)) throw new Exception("ERROR - " . db_error());
 		}
@@ -64,7 +63,7 @@ class Role {
 				WHERE r.project_id = ".$project->getProjectId()."
 					AND r.role_name = '$roleName'";
 
-		echo "GET Role $sql";
+		//echo "GET Role $sql";
 
 		return db_result(db_query($sql),0);
 	}
