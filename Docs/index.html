@@ -83,7 +83,79 @@
             </td>
             <td class="td">
                 <ul>
-                    <li>Library Two</li>
+                    <li><a href="#">Arm</a></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td class="td">
+                <ul>
+                    <li><a href="#">Collection</a></li>
+                </ul>
+            </td>
+            <td class="td">
+                <ul>
+                    <li><a href="#">Core</a></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td class="td">
+                <ul>
+                    <li><a href="#">Event</a></li>
+                </ul>
+            </td>
+            <td class="td">
+                <ul>
+                    <li><a href="#">Metadata</a></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td class="td">
+                <ul>
+                    <li><a href="#">Proj</a></li>
+                </ul>
+            </td>
+            <td class="td">
+                <ul>
+                    <li><a href="#">Project</a></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td class="td">
+                <ul>
+                    <li><a href="#">Record</a></li>
+                </ul>
+            </td>
+            <td class="td">
+                <ul>
+                    <li><a href="#">RedcapData</a></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td class="td">
+                <ul>
+                    <li><a href="#">RedcapLog</a></li>
+                </ul>
+            </td>
+            <td class="td">
+                <ul>
+                    <li><a href="#">RestCallRequest</a></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td class="td">
+                <ul>
+                    <li><a href="#">Role</a></li>
+                </ul>
+            </td>
+            <td class="td">
+                <ul>
+                    <li><a href="#">User_Rights</a></li>
                 </ul>
             </td>
         </tr>
@@ -96,18 +168,20 @@
 
     <code>
         // Include single helper<br/>
-        $Core->Helpers('Helper1');<br/>
+        $Core->Helpers('Encryption');<br/>
         <br/><br/>
         // Include array of helpers<br/>
-        $Core->Helpers(array('Helper1','Helper2'));<br/>
+        $Core->Helpers(array('Encryption','getPassthruUrl'));<br/>
     </code>
 
     <h3>Usage:</h3>
     <p>Once included into the CORE a helper can be accessed by simply calling the include function;</p>
 
     <code>
-        // Calling the Helper1 function from the Core<br/>
-        helper1();
+        // Calling the Encryption function(s) from the Core<br/>
+        $str = encrypt( $str );<br/><br/>
+
+        $str = decrypt( $str );<br/>
     </code>
 
     <h3>Helpers:</h3>
@@ -124,8 +198,18 @@
             </td>
             <td class="td">
                 <ul>
-                    <li>Helper Two</li>
+                    <li><a href="#">getPassthruUrl</a></li>
                 </ul>
+            </td>
+        </tr>
+        <tr>
+            <td class="td">
+                <ul>
+                    <li><a href="#">cleanupSurveyParticipantsBySurveyRecord</a></li>
+                </ul>
+            </td>
+            <td class="td">
+                &nbsp;
             </td>
         </tr>
     </table>
@@ -147,7 +231,7 @@ $Core->getJs();<br/>
         require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php';<br/>
     </code>
 
-    <h2>Overriding CORE Libraries</h2>
+    <h2>Overriding CORE Libraries & Helpers</h2>
     <p>The CORE libraries can be overidden with local versions of those libraries.</p>
 
     <h3>Local Location</h3>
