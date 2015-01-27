@@ -1,6 +1,7 @@
 <?php
 
 namespace Plugin;
+use \InvalidArgumentException;
 
 class RestCallRequest
 {
@@ -126,10 +127,15 @@ class RestCallRequest
     {
         $data = ($data !== null) ? $data : $this->requestBody;
 
-        if (!is_array($data))
-            throw new InvalidArgumentException('Invalid data input for postBody.  Array expected');
+		if(is_string($data)) {
 
-        $data = http_build_query($data, '', '&');
+		}
+		else {
+			if (!is_array($data))
+				throw new InvalidArgumentException('Invalid data input for postBody.  Array expected');
+
+			$data = http_build_query($data, '', '&');
+		}
         $this->requestBody = $data;
     }
 
