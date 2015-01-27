@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>RD Web Service Library</title>
+
+    <style type='text/css' media='all'>@import url('./userguide.css');</style>
+    <link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+
+    <meta http-equiv='expires' content='-1' />
+    <meta http-equiv= 'pragma' content='no-cache' />
+    <meta name='robots' content='all' />
+
+</head>
+<body>
+
+<!-- START NAVIGATION -->
+<div id="nav"><div id="nav_inner"></div></div>
+<div id="nav2"><a name="top">&nbsp;</a></div>
+<!-- END NAVIGATION -->
+
+
+<!-- START BREADCRUMB -->
+<!-- END BREADCRUMB -->
+
+<br clear="all" />
+
+
+<!-- START CONTENT -->
+<div id="content">
+
+
+    <h1>RDWS (RD Web service)</h1>
+
+    <p>Used to communicate with RD web service and perform RESTful calls.</p>
+
+    <p class="important"><strong>Dependencies:</strong>&nbsp;  <kbd>RestCallRequest</kbd></p>
+
+    <p>Features:</p>
+
+    <ul>
+        <li>doRequest</li>
+    </ul>
+
+    <h2>doRequest( $params, $useTestURL = false )</h2>
+
+    <code>
+
+        require_once '../Core/bootstrap.php';<br/>
+        $Core->Libraries(array( 'RestCallRequest', 'Rdws' ));<br/><br/>
+
+        $MRN = [MRN_OF_PATIENT];<br/><br/>
+
+        // Sends request to production RD server for date of birth<br/>
+        $params = '{"id":"'.$MRN.'","fields":[{"field":"dob"}]}'; <br/>
+        $data = $Core->Rdws->doRequest($params);<br/><br/>
+
+        // Sends request to test RD server for date of birth and last name<br/>
+        $params = '{"id":"'.$MRN.'","fields":[{"field":"dob"}, {"field":"lastName"}]}'; <br/>
+        $data = $Core->Rdws->doRequest($params, true);<br/><br/>
+    </code>
+
+
+    <h2>Valid Fields</h2>
+
+    <p>This is a list of demographic fields that can be requested from the RD web service.</p>
+
+    <ul>
+        <li>lastName</li>
+        <li>firstName</li>
+        <li>dob</li>
+        <li>gender</li>
+        <li>ethnicity</li>
+        <li>race</li>
+        <li>mrn</li>
+    </ul>
+
+    <p>Other fields can be utilized to pull lab work and can be viewed by accessing the metadata URL:</p>
+    <a href="https://biovu2.vanderbilt.edu/rdws/redcap/meta">https://biovu2.vanderbilt.edu/rdws/redcap/meta</a>
+</div>
+<!-- END CONTENT -->
+
+
+<div id="footer">
+</div>
+
+</body>
+</html>
