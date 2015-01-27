@@ -12,6 +12,7 @@
  */
 
 namespace Plugin;
+$GLOBALS["Core"]->Libraries("RestCallRequest");
 class Rdws {
 
     private $rdURL;
