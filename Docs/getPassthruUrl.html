@@ -31,41 +31,33 @@
 <div id="content">
 
 
-    <h1>Encryption Helper</h1>
+    <h1>getPassthruUrl Helper</h1>
 
-    <p>Exposes functions to aid in encrypting/decrypting strings.</p>
+    <p>Returns a string representation of the URL to passthru a participant to a project survey.</p>
 
     <p>Functions:</p>
 
     <ul>
-        <li>encrypt</li>
-        <li>decrypt</li>
+        <li>getPassthruUrl</li>
     </ul>
 
-    <h2>encrypt()</h2>
-    <p>Used to encrypt a given string.</p>
+    <h2>getPassthruUrl( $projectId, $participantId )</h2>
+    <p>Used to generate passthru code and URL.</p>
     <code>
         require_once '../Core/bootstrap.php'; <br/><br/>
 
-        $Core->Helpers(array('Encryption'));<br/><br/>
+        $Core->Helpers(array('getPassthruUrl'));<br/><br/>
 
-        $str = 'Text To Be Encrypted';<br/><br/>
+        // Get passthru URL<br/>
+        $project_id = 10;<br/>
+        $participant_id = 100;<br/><br/>
 
-        // Encrypt string<br/>
-        $encryptStr = encrypt( $str );<br/><br/>
+        $passthruUrl = getPassthruUrl( $project_id, $participant_id );<br/><br/>
 
-    </code>
+        print $passthruURl;<br/><br/>
 
-    <h2>decrypt()</h2>
-    <p>Used to decrypt a given string.</p>
-    <code>
-        require_once '../Core/bootstrap.php';<br/><br/>
-
-        $Core->Helpers(array('Encryption'));<br/><br/>
-
-        // Decrypt string<br/>
-        $str = decrypt( $encryptStr );<br/>
-
+        // Returns<br/>
+        // passthru.php?code=GENERATED_CODE_HERE<br/>
     </code>
 
 </div>

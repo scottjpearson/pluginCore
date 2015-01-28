@@ -48,25 +48,25 @@
 
     <code>
         // Include single library<br/>
-        $Core->Libraries('Encrypt');<br/>
+        $Core->Libraries('Rdws');<br/>
         <br/><br/>
         // Include array of libraries<br/>
-        $Core->Libraries(array('Encrypt','Project'));<br/>
+        $Core->Libraries(array('Rdws','Project'));<br/>
     </code>
 
     <h3>Usage:</h3>
     <p>Once included into the CORE a library can be accessed using its name as an object on the CORE;</p>
 
     <code>
-        // Calling the Encrypt library from the Core<br/>
-        $encrypted = new $Core->Encrypt();
+        // Calling the Rdws library from the Core<br/>
+        $encrypted = new $Core->Rdws();
     </code>
 
     <p>The library can also be accessed directly</p>
 
     <code>
-        // Calling the Encrypt library directly<br/>
-        $encrypted = new Encrypt();
+        // Calling the Rdws library directly<br/>
+        $encrypted = new Rdws();
     </code>
 
     <h3>Libraries:</h3>
@@ -164,7 +164,7 @@
     <h2>Using $CORE->Helpers</h2>
 
     <h3>Including:</h3>
-    <p>Helpers in CORE act as collections of common fuctions.  To include a helper for use by the CORE you can either define a single helper or an array of helpers.</p>
+    <p>Helpers in CORE act as collections of common functions.  To include a helper for use by the CORE you can either define a single helper or an array of helpers.</p>
 
     <code>
         // Include single helper<br/>
@@ -175,7 +175,7 @@
     </code>
 
     <h3>Usage:</h3>
-    <p>Once included into the CORE a helper can be accessed by simply calling the include function;</p>
+    <p>Once included into the CORE a helper can be accessed by simply calling the included function;</p>
 
     <code>
         // Calling the Encryption function(s) from the Core<br/>
@@ -198,7 +198,7 @@
             </td>
             <td class="td">
                 <ul>
-                    <li><a href="#">getPassthruUrl</a></li>
+                    <li><a href="getPassthruUrl.html">getPassthruUrl</a></li>
                 </ul>
             </td>
         </tr>
@@ -230,6 +230,7 @@ $Core->getCss();<br/>
 $Core->getJs();<br/>
         require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php';<br/>
     </code>
+    <p class="important"><strong>Note:</strong> The <kbd>ProjectGeneral/header.php</kbd> and <kbd>ProjectGeneral/footer.php</kbd> includes are only required if you are encapsulating a plugin within the Redcap interface.  For standalone plugins these includes should be omitted. </p>
 
     <h2>Overriding CORE Libraries & Helpers</h2>
     <p>The CORE libraries can be overidden with local versions of those libraries.</p>
