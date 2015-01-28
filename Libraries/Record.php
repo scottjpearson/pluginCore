@@ -310,8 +310,11 @@ class Record {
 		// $newRecord = new self($project,"","");
 		$newRecord->id = $id;
 
-		# Get first metadata field and use that to set the recordId in the details of this record
-		$newRecord->details = array($project->getFirstFieldName() => $id);
+		# Don't do this, added it for new records, but existing records would never be able to retrieve their
+		# details if this was done. Correct record creation process for auto ID projects is to run
+		# $project->getAutoId() and then create a Record using the normal Record constructor.
+//		# Get first metadata field and use that to set the recordId in the details of this record
+//		$newRecord->details = array($project->getFirstFieldName() => $id);
 
 		return $newRecord;
 	}
