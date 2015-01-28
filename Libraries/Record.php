@@ -5,6 +5,7 @@ namespace Plugin;
 use \Exception;
 
 include_once("Project.php");
+include_once("Core.php");
 
 # Class for looking up and editing a single record on a given project
 class Record {
@@ -75,7 +76,7 @@ class Record {
 
 		foreach($changes as $fieldName => $value) {
 			# Skip values that already match $this->details
-			if($skipUnchangedValues && $this->details[$fieldName] == $value) continue;
+			if($skipUnchangedValues && $this->details[$fieldName] === $value) continue;
 
 			# For checkboxes, review the list of values before determining what to save
 			if($this->project->isCheckbox($fieldName)) {
@@ -153,11 +154,11 @@ class Record {
 			if(!db_query($sql)) throw new Exception("Couldn't create Instrument record ".$sql, self::INSERT_ERROR);
 		}
 
-		if($updateCount == 0 && count($insertStatements) > 0) {
+		if($changes[$this->project->getFirstFieldName()] != "" && $updateCount == 0 && count($insertStatements) > 0) {
 			$logType = "INSERT";
 			$logDescription = "Creating Record";
 		}
-		else if($updateCount > 0) {
+		else if($updateCount > 0 || count($insertStatements) > 0) {
 			$logType = "UPDATE";
 			$logDescription = "Updating Record";
 		}
@@ -308,6 +309,9 @@ class Record {
 		$newRecord = new Record($project,"","");
 		// $newRecord = new self($project,"","");
 		$newRecord->id = $id;
+
+		# Get first metadata field and use that to set the recordId in the details of this record
+		$newRecord->details = array($project->getFirstFieldName() => $id);
 
 		return $newRecord;
 	}

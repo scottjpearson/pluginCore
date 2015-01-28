@@ -2,6 +2,8 @@
 /** Author: Kyle McGuffin */
 namespace Plugin;
 
+include_once("Core.php");
+
 use \Exception;
 
 # Class for looking up REDCap project IDs and metadata
@@ -55,14 +57,16 @@ class Project {
 		return ($this->metadata[$columnName]["element_type"] == "checkbox");
 	}
 
-	# Get first timestamp from the instrumentProjects array
-	public function getFirstTimestampName() {
-		return self::$instrumentProjects[$this->projectName][0];
-	}
+	# Get the first field name from the metedata table
+	public function getFirstFieldName() {
+		$this->fetchMetadata();
 
-	# Get last timestamp from the instrumentProjects array
-	public function getLastTimestampName() {
-		return self::$instrumentProjects[$this->projectName][1];
+		foreach($this->metadata as $metadataRow) {
+			if($metadataRow["field_order"] == 1) {
+				return $metadataRow["field_name"];
+			}
+		}
+		return false;
 	}
 
 	# Lookup project metadata from the database
@@ -85,7 +89,7 @@ class Project {
 		return $this->metadata;
 	}
 
-	# Look up the instrument table's project ID if that hasn't been done already
+	# Look up this project's project ID if that hasn't been done already
 	private final function initializeProjectIds() {
 		if(!isset($this->projectId) && $this->projectName != "") {
 			list($this->projectId, $this->eventId) = self::getProjectAndEvent($this->projectName);
@@ -222,27 +226,6 @@ class Project {
 		return array(NULL, NULL);
 	}
 
-	# Public function for getting the operational project array
-	public final static function getOperationalProjects() {
-		return self::$operationalProjects;
-	}
-
-	# Public function for getting the instrument project array
-	public final static function getInstrumentProjects() {
-		return self::$instrumentProjects;
-	}
-
-	# Public function for getting the cron project array
-	public final static function getCronProjects() {
-		return self::$cronProjects;
-	}
-
-	# Public function for getting a list of all NCS projects
-	public final static function getProjectList() {
-		# merge all above arrays into one massive array
-		return array_merge(self::$operationalProjects, array_keys(self::$instrumentProjects), self::$cronProjects);
-	}
-
 	# Public function for converting enum field in metadata into raw or label values
 	public final static function renderEnumData($data, $enum, $rawOrLabel = "label") {
 		// make sure that the \n's are also treated as line breaks
@@ -300,15 +283,4 @@ class Project {
 
 		return $enumArray;
 	}
-
-	# Get first timestamp from the instrumentProjects array
-	public static function getFirstTimestampByProject($projectName) {
-		return self::$instrumentProjects[$projectName][0];
-	}
-
-	# Get last timestamp from the instrumentProjects array
-	public static function getLastTimestampByProject($projectName) {
-		return self::$instrumentProjects[$projectName][1];
-	}
-
 } 
