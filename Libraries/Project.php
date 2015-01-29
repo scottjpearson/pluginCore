@@ -2,7 +2,7 @@
 /** Author: Kyle McGuffin */
 namespace Plugin;
 
-include_once("Core.php");
+$GLOBALS["Core"]->Libraries(array("Record","Core"));
 
 use \Exception;
 
@@ -67,6 +67,15 @@ class Project {
 			}
 		}
 		return false;
+	}
+
+	public function createNewAutoIdRecord() {
+		# TODO should check project to see if auto-numbering is enabled first
+		$recordFieldName = $this->getFirstFieldName();
+		$newRecord = new Record($this,array(array($recordFieldName)),array($recordFieldName => $this->getAutoId()));
+		$newRecord->getDetails();
+
+		return $newRecord;
 	}
 
 	# Lookup project metadata from the database

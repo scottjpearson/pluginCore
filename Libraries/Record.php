@@ -4,8 +4,7 @@ namespace Plugin;
 
 use \Exception;
 
-include_once("Project.php");
-include_once("Core.php");
+$GLOBALS["Core"]->Libraries(array("Project","Core"));
 
 # Class for looking up and editing a single record on a given project
 class Record {
@@ -179,6 +178,12 @@ class Record {
 	# Stub function for handling data triggers on particular projects
 	public function trigger() {
 
+	}
+
+	public function setDetails($newDetails) {
+		if(!isset($this->details)) {
+			$this->details = $newDetails;
+		}
 	}
 
 	# Loops through the 2-dimensional $keys array to determine if $this->keyValues is a valid key for this project

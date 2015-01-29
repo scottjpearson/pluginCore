@@ -1,4 +1,4 @@
-<?PHP
+<?php
 
 class Plugin_Core
 {
@@ -15,9 +15,10 @@ class Plugin_Core
         {
             foreach( $libraries as $library )
             {
-				if(in_array($library,$this->includedLibraries)) {
-					return;
+				if(in_array($library,$this->includedLibraries,true)) {
+					continue;
 				}
+
                 if(!self::loadLibrary( $library ))
                 {
                     $success = false;
@@ -54,8 +55,8 @@ class Plugin_Core
 		## See if the library exists locally in Plugin/Library
 		if( file_exists( self::currentDirectory() . '/Libraries/' . $library . '.php' ) )
 		{
-			require_once( self::currentDirectory() . '/Libraries/' . $library . '.php' );
 			$this->includedLibraries[] = $library;
+			require_once( self::currentDirectory() . '/Libraries/' . $library . '.php' );
 			$this->$library = new $libaryNamespaceName();
 
 			$return = true;
@@ -63,8 +64,8 @@ class Plugin_Core
         ## Then check if the core library exists, if the local doesn't
         else if( file_exists( __DIR__ . '/Libraries/' . $library . '.php' ) )
         {
-            require_once(__DIR__ . '/Libraries/' . $library . '.php' );
 			$this->includedLibraries[] = $library;
+            require_once(__DIR__ . '/Libraries/' . $library . '.php' );
 			$this->$library = new $libaryNamespaceName();
 
             $return = true;

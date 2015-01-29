@@ -1,8 +1,14 @@
-<?PHP
-
+<?php
+$doNotLoad = false;
+if(class_exists("Plugin_Core",false)) {
+	$doNotLoad = true;
+}
 ## Include the Core object
-include 'Plugin_Core.php';
-$Core = new Plugin_Core();
+include_once('Plugin_Core.php');
+
+if(!$doNotLoad) {
+	$Core = new Plugin_Core();
+}
 
 
 
