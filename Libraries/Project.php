@@ -57,6 +57,13 @@ class Project {
 		return ($this->metadata[$columnName]["element_type"] == "checkbox");
 	}
 
+	# Check the metadata to determine if a field is a checkbox
+	public function isDate($columnName) {
+		$this->fetchMetadata();
+
+		return (strpos($this->metadata[$columnName]["element_type"], "date_") !== false);
+	}
+
 	# Get the first field name from the metedata table
 	public function getFirstFieldName() {
 		$this->fetchMetadata();
