@@ -61,10 +61,10 @@ class Project {
 	public function isDate($columnName) {
 		$this->fetchMetadata();
 
-		return (strpos($this->metadata[$columnName]["element_type"], "date_") !== false);
+		return (strpos($this->metadata[$columnName]["element_validation_type"], "date_") !== false);
 	}
 
-	# Get the first field name from the metedata table
+	# Get the first field name from the metadata table
 	public function getFirstFieldName() {
 		$this->fetchMetadata();
 
