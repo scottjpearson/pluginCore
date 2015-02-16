@@ -27,7 +27,7 @@ class Rdws {
         }
 
         global $Core;
-        $request = new $Core->RestCallRequest($this->rdURL, 'POST', $params);
+        $request = new $Core->RestCallRequest($this->rdURL, 'POST', $params, true);
         $request->execute();
         return json_decode( $request->getResponseBody() ) ;
     }
