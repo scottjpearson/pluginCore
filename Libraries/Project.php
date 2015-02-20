@@ -2,7 +2,7 @@
 /** Author: Kyle McGuffin */
 namespace Plugin;
 
-$GLOBALS["Core"]->Libraries(array("Record","Core","Metadata","Collection"));
+$GLOBALS["Core"]->Libraries(array("Record","Core","MetadataCollection"));
 
 use \Exception;
 
@@ -14,7 +14,6 @@ class Project {
 	const SQL_ERROR = 3;
 	const INSERT_ERROR = 4;
 
-	/* @var $metadata \Plugin\Collection */
 	private $projectName;
 	private $projectId;
 	private $eventId;
@@ -23,7 +22,7 @@ class Project {
 
 	public function __construct($projectName) {
 		$this->projectName = $projectName;
-		$this->metadata = new Collection();
+		$this->metadata = new MetadataCollection();
 
 		$this->initializeProjectIds();
 	}
@@ -49,21 +48,21 @@ class Project {
 
 		if($columnName == "") return $this->metadata;
 
-		return $this->metadata->getItem($columnName);
+		return $this->metadata->getField($columnName);
 	}
 
 	# Check the metadata to determine if a field is a checkbox
 	public function isCheckbox($columnName) {
 		$this->fetchMetadata();
 
-		return ($this->metadata->getItem($columnName)->getElementType() == "checkbox");
+		return ($this->metadata->getField($columnName)->getElementType() == "checkbox");
 	}
 
 	# Check the metadata to determine if a field is a checkbox
 	public function isDate($columnName) {
 		$this->fetchMetadata();
 
-		return (strpos($this->metadata->getItem($columnName)->getElementValidationType(), "date_") !== false);
+		return (strpos($this->metadata->getField($columnName)->getElementValidationType(), "date_") !== false);
 	}
 
 	# Get the first field name from the metadata table
@@ -82,7 +81,8 @@ class Project {
 	public function createNewAutoIdRecord() {
 		# TODO should check project to see if auto-numbering is enabled first
 		$recordFieldName = $this->getFirstFieldName();
-		$newRecord = new Record($this,array(array($recordFieldName)),array($recordFieldName => $this->getAutoId()));
+		$newRecordId = $this->getAutoId();
+		$newRecord = new Record($this,array(array($recordFieldName)),array($recordFieldName => $newRecordId));
 		$newRecord->getDetails();
 
 		return $newRecord;
@@ -90,7 +90,7 @@ class Project {
 
 	# Lookup project metadata from the database
 	protected function fetchMetadata() {
-		if(!isset($this->metadata)) {
+		if(count($this->metadata) == 0) {
 			$this->metadata = Metadata::getItemsByProject($this);
 		}
 

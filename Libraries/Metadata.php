@@ -481,7 +481,7 @@ class Metadata {
 
 	/**
 	 * @param \Plugin\Project $project
-	 * @return \Plugin\Collection
+	 * @return \Plugin\MetadataCollection
 	 */
 	public static function getItemsByProject(Project $project) {
 		$sql = "SELECT *
@@ -489,7 +489,7 @@ class Metadata {
 				WHERE project_id = {$project->getProjectId()}
 				ORDER BY field_order";
 		$result = db_query($sql);
-		$col = new Collection();
+		$col = new MetadataCollection();
 		while ($row = db_fetch_assoc($result)) {
 			$item = new self();
 			foreach($row as $column => $value) {
