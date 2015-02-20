@@ -2,6 +2,9 @@
 /** Author: Jon Scherdin */
 namespace Plugin;
 
+global $Core;
+$Core->Libraries("Collection");
+
 class Metadata {
 	private static $tableName = "redcap_metadata";
 
@@ -456,9 +459,31 @@ class Metadata {
 	function __construct() { }
 
 	/**
+	 * @param Proj $project
 	 * @return Metadata[]
 	 */
-	public static function getItemsByProject(Proj $project) {
+	public static function getItemsByProj(Proj $project) {
+		$sql = "SELECT *
+				FROM ".self::$tableName."
+				WHERE project_id = {$project->getProjectId()}
+				ORDER BY field_order";
+		$result = db_query($sql);
+		$col = new Collection();
+		while ($row = db_fetch_assoc($result)) {
+			$item = new self();
+			foreach($row as $column => $value) {
+				$item->$column = $value;
+			}
+			$col->add($item);
+		}
+		return $col;
+	}
+
+	/**
+	 * @param \Plugin\Project $project
+	 * @return \Plugin\Collection
+	 */
+	public static function getItemsByProject(Project $project) {
 		$sql = "SELECT *
 				FROM ".self::$tableName."
 				WHERE project_id = {$project->getProjectId()}

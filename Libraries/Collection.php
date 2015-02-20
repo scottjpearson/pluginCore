@@ -8,7 +8,7 @@ class Collection extends \ArrayObject {
 	}
 
 	public function getItem($key) {
-		parent::offsetGet($key);
+		return parent::offsetGet($key);
 	}
 
 	public function delete($key) {

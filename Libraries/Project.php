@@ -2,7 +2,7 @@
 /** Author: Kyle McGuffin */
 namespace Plugin;
 
-$GLOBALS["Core"]->Libraries(array("Record","Core"));
+$GLOBALS["Core"]->Libraries(array("Record","Core","Metadata","Collection"));
 
 use \Exception;
 
@@ -14,6 +14,7 @@ class Project {
 	const SQL_ERROR = 3;
 	const INSERT_ERROR = 4;
 
+	/* @var $metadata \Plugin\Collection */
 	private $projectName;
 	private $projectId;
 	private $eventId;
@@ -22,6 +23,7 @@ class Project {
 
 	public function __construct($projectName) {
 		$this->projectName = $projectName;
+		$this->metadata = new Collection();
 
 		$this->initializeProjectIds();
 	}
@@ -47,30 +49,31 @@ class Project {
 
 		if($columnName == "") return $this->metadata;
 
-		return $this->metadata[$columnName];
+		return $this->metadata->getItem($columnName);
 	}
 
 	# Check the metadata to determine if a field is a checkbox
 	public function isCheckbox($columnName) {
 		$this->fetchMetadata();
 
-		return ($this->metadata[$columnName]["element_type"] == "checkbox");
+		return ($this->metadata->getItem($columnName)->getElementType() == "checkbox");
 	}
 
 	# Check the metadata to determine if a field is a checkbox
 	public function isDate($columnName) {
 		$this->fetchMetadata();
 
-		return (strpos($this->metadata[$columnName]["element_validation_type"], "date_") !== false);
+		return (strpos($this->metadata->getItem($columnName)->getElementValidationType(), "date_") !== false);
 	}
 
 	# Get the first field name from the metadata table
 	public function getFirstFieldName() {
 		$this->fetchMetadata();
 
+		/* @var $metadataRow Metadata */
 		foreach($this->metadata as $metadataRow) {
-			if($metadataRow["field_order"] == 1) {
-				return $metadataRow["field_name"];
+			if($metadataRow->getFieldOrder() == 1) {
+				return $metadataRow->getFieldName();
 			}
 		}
 		return false;
@@ -88,18 +91,7 @@ class Project {
 	# Lookup project metadata from the database
 	protected function fetchMetadata() {
 		if(!isset($this->metadata)) {
-			$sql = "SELECT m.*
-					FROM redcap_metadata m
-					WHERE m.project_id = {$this->projectId}
-					ORDER BY m.field_order";
-
-			if(!($result = db_query($sql))) throw new Exception("Failed to lookup metadata");
-
-			$this->metadata = array();
-
-			while($row = db_fetch_assoc($result)) {
-				$this->metadata[$row["field_name"]] = $row;
-			}
+			$this->metadata = Metadata::getItemsByProject($this);
 		}
 
 		return $this->metadata;
