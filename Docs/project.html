@@ -3,7 +3,7 @@
 <head>
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Record Library Documentation</title>
+<title>Project Library Documentation</title>
 
 <style type='text/css' media='all'>@import url('./userguide.css');</style>
 <link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
@@ -31,22 +31,19 @@
 <div id="content">
 
 
-<h1>Record Class</h1>
+<h1>Project Class</h1>
 
-<p>A class for accessing a single REDCap record.</p>
+<p>A class for accessing a single REDCap project.</p>
 
 <h2>Usage</h2>
 
-<p>A Record object is called as such 
-    <code>$record = new Record($projectObject, $keys, $keyValues);<br /><br />
-        
-        // Or call it with new objects<br />
-        $record = new Record(new Project("project_name"), <br />
-        &emsp;array(array("first_key"),array("second_key_p1","second_key_p2")), <br />
-        &emsp;array("second_key_p1" => "first_value", "second_key_p2" => "second_value"));</code>
-    Record objects require a <a href="project.html">Project</a> object <var>$projectObject</var><br />
-    The first array <var>$keys</var> stores the unique key list for the given project. This is more useful when extending the Record class.<br />
-    The second array <var>$keyValues</var> stores the specific key values to be used to find the record ID.</p>
+<p>A Project object is called as such
+    <code>$project = new Project($projectName);</code>
+    Project objects require a string <var>$projectName</var>. This string is the short code found in parenthesis at the end of a project's app_title.<br /><br />
+
+    For example, the project titled "PCORI Patient List (pcori_patient_list)" would be stored in a $project by calling the code below:
+
+    <code>$project = new Project("pcori_patient_list");</code></p>
 
 <h2>Object Function List</h2>
 
