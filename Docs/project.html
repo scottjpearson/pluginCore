@@ -132,19 +132,19 @@
     <tr>
         <td class="td"><strong>getProjectAndEvent</strong></td>
         <td class="td">string <var>$projectShortCode</var></td>
-        <td class="td">array("project_id" => integer,"event_id" => integer)</td>
+        <td class="td">array(<br />&nbsp&nbsp"project_id" => integer,<br />&nbsp&nbsp"event_id" => integer<br />)</td>
         <td class="td">Queries the database to find a project ID and the first event ID for that project based on the given short code.</td>
     </tr>
     <tr>
         <td class="td"><strong>renderEnumData</strong></td>
-        <td class="td">string <var>$value</var>, string <var>$enum</var>, optional string $rawOrLabel ("raw" or "label")</td>
+        <td class="td">string <var>$value</var>,<br />string <var>$enum</var>,<br />optional string $rawOrLabel<br />("raw" or "label")</td>
         <td class="td">string</td>
         <td class="td">Takes a <var>$value</var> from the redcap_data table and the element_enum (<var>$enum</var>) from the redcap_metadata
             and converts the $value into the raw enum value or the enum label.</td>
     </tr>
     <tr>
         <td class="td"><strong>convertEnumToArray</strong></td>
-        <td class="td">string <var>$enum</var>, optional string $rawOrLabel ("raw" or "label")</td>
+        <td class="td">string <var>$enum</var>,<br />optional string $rawOrLabel<br />("raw" or "label")</td>
         <td class="td">array</td>
         <td class="td">Takes an element_enum (<var>$enum</var>) from the redcap_metadata
             and converts it into an associative array in the format array("rawOrLabel" => "labelOrRaw").</td>
