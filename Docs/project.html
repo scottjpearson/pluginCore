@@ -47,7 +47,7 @@
 
 <h2>Object Function List</h2>
 
-    <table cellpadding="0" cellspacing="1" border="0" style="width:100%" class="tableborder">
+<table cellpadding="0" cellspacing="1" border="0" style="width:100%" class="tableborder">
     <tr>
         <th>Function</th>
         <th>Parameters</th>
@@ -55,47 +55,68 @@
         <th>Description</th>
     </tr>
     <tr>
-        <td class="td"><strong>getDetails</strong></td>
-        <td class="td">optional string <var>$columnName</var></td>
-        <td class="td">string (with $columnName) or Array</td>
-        <td class="td">Will search for the details in the REDCap DB if necessary and return either all the fields
-                as an associative array or a string containing a single field's value.</td>
-    </tr>
-    <tr>
-        <td class="td"><strong>updateDetails</strong></td>
-        <td class="td">Array $newDetails</td>
-        <td class="td">Record $this</td>
-        <td class="td">Uses key => value pairs in $newDetails to INSERT/UPDATE redcap_data table with new values
-                including logging the changes to redcap_log_events and correctly handling check-boxes (can pass an
-                array of values to the check-box field). Also updates the stored details of the Record object with
-                the new values.</td>
-    </tr>
-    <tr>
-        <td class="td"><strong>setDetails</strong></td>
-        <td class="td">Array $newDetails</td>
-        <td class="td">none</td>
-        <td class="td">Uses key => value pairs in $newDetails to set the stored details of the Record object. Does not
-                query the database.</td>
-    </tr>
-    <tr>
-        <td class="td"><strong>getKeys</strong></td>
-        <td class="td">none</td>
-        <td class="td">Array</td>
-        <td class="td">Returns the 2D array of keys saved in this Record object.</td>
-    </tr>
-    <tr>
-        <td class="td"><strong>getId</strong></td>
+        <td class="td"><strong>getProjectName</strong></td>
         <td class="td">none</td>
         <td class="td">string</td>
-        <td class="td">Returns the record name stored in this Record object. Will search the database for a single
-                record that matches the arrayKeys field value combination and throw an exception if more or less than
-                one matching record is found. Exception types are NO_RECORD_ERROR and MULTIPLE_RECORD_ERROR.</td>
+        <td class="td">Returns the project name stored in this Project object.</td>
     </tr>
     <tr>
-        <td class="td"><strong>getProjectObject</strong></td>
+        <td class="td"><strong>getProjectId</strong></td>
         <td class="td">none</td>
-        <td class="td">Project</td>
-        <td class="td">Returns the project object stored for this record.</td>
+        <td class="td">integer</td>
+        <td class="td">Returns the project ID stored in this Project object. Will search the database for the project
+                that matches the project name if the project ID has not been set yet.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>getEventId</strong></td>
+        <td class="td">none</td>
+        <td class="td">integer</td>
+        <td class="td">Returns the event ID stored in this Project object. Will search the database for the first event
+            ID associated with the stored project ID if the event ID has not been set yet.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>getMetadata</strong></td>
+        <td class="td">option string <var>$fieldName</var></td>
+        <td class="td">MetadataCollection or Metadata</td>
+        <td class="td">Returns either the entire collection of Metadata for the stored project ID or a single Metadata object
+            depending on if a $fieldName is provided.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>isCheckbox</strong></td>
+        <td class="td">string <var>$fieldName</var></td>
+        <td class="td">bool</td>
+        <td class="td">Checks the element type on the metadata table of the given field name. Returns true if the field is a checkbox.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>isDate</strong></td>
+        <td class="td">string <var>$fieldName</var></td>
+        <td class="td">bool</td>
+        <td class="td">Checks the element validation type on the metadata table of the given field name. Returns true if the field is restricted to a date format.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>getFirstFieldName</strong></td>
+        <td class="td">none</td>
+        <td class="td">string</td>
+        <td class="td">Looks at metadata table for the given project ID and returns the field name with a field order of 1.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>getAutoId</strong></td>
+        <td class="td">none</td>
+        <td class="td">integer</td>
+        <td class="td">Generates an auto-numbered record on the stored project ID, verifies that the record ID is unique
+            and then logs the record's creation before returning the new record ID.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>createNewAutoIdRecord</strong></td>
+        <td class="td">none</td>
+        <td class="td">Record</td>
+        <td class="td">Uses the getAutoId function to create a new record on this project and returns a record object pointed to that record.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>getUniqueRecordList</strong></td>
+        <td class="td">none</td>
+        <td class="td">array of strings</td>
+        <td class="td">Queries the database to find a unique list of record IDs associated with the stored project ID.</td>
     </tr>
 </table>
 
@@ -109,13 +130,24 @@
         <th>Description</th>
     </tr>
     <tr>
-        <td class="td"><strong>createRecordFromId</strong></td>
-        <td class="td">Project <var>$project</var>, string <var>$id</var></td>
-        <td class="td">Record</td>
-        <td class="td">Creates a new Record object and sets the $project and $id values. At this point, the record's details
-                can be the by using getDetails() which will pull the record details from the database or by using
-                setDetails() which will set the record details using the provided array. Using this function and setDetails
-                will allow many record objects to be created from a single database query.</td>
+        <td class="td"><strong>getProjectAndEvent</strong></td>
+        <td class="td">string <var>$projectShortCode</var></td>
+        <td class="td">array("project_id" => integer,"event_id" => integer)</td>
+        <td class="td">Queries the database to find a project ID and the first event ID for that project based on the given short code.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>renderEnumData</strong></td>
+        <td class="td">string <var>$value</var>, string <var>$enum</var>, optional string $rawOrLabel ("raw" or "label")</td>
+        <td class="td">string</td>
+        <td class="td">Takes a <var>$value</var> from the redcap_data table and the element_enum (<var>$enum</var>) from the redcap_metadata
+            and converts the $value into the raw enum value or the enum label.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>convertEnumToArray</strong></td>
+        <td class="td">string <var>$enum</var>, optional string $rawOrLabel ("raw" or "label")</td>
+        <td class="td">array</td>
+        <td class="td">Takes an element_enum (<var>$enum</var>) from the redcap_metadata
+            and converts it into an associative array in the format array("rawOrLabel" => "labelOrRaw").</td>
     </tr>
 </table>
 

@@ -50,12 +50,32 @@
 
 <h2>Object Function List</h2>
 
-    <table cellpadding="0" cellspacing="1" border="0" style="width:100%" class="tableborder">
+<table cellpadding="0" cellspacing="1" border="0" style="width:100%" class="tableborder">
     <tr>
         <th>Function</th>
         <th>Parameters</th>
         <th>Return</th>
         <th>Description</th>
+    </tr>
+    <tr>
+        <td class="td"><strong>getKeys</strong></td>
+        <td class="td">none</td>
+        <td class="td">Array</td>
+        <td class="td">Returns the 2D array of keys saved in this Record object.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>getId</strong></td>
+        <td class="td">none</td>
+        <td class="td">string</td>
+        <td class="td">Returns the record name stored in this Record object. Will search the database for a single
+            record that matches the arrayKeys field value combination and throw an exception if more or less than
+            one matching record is found. Exception types are NO_RECORD_ERROR and MULTIPLE_RECORD_ERROR.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>getProjectObject</strong></td>
+        <td class="td">none</td>
+        <td class="td">Project</td>
+        <td class="td">Returns the project object stored for this record.</td>
     </tr>
     <tr>
         <td class="td"><strong>getDetails</strong></td>
@@ -79,26 +99,6 @@
         <td class="td">none</td>
         <td class="td">Uses key => value pairs in $newDetails to set the stored details of the Record object. Does not
                 query the database.</td>
-    </tr>
-    <tr>
-        <td class="td"><strong>getKeys</strong></td>
-        <td class="td">none</td>
-        <td class="td">Array</td>
-        <td class="td">Returns the 2D array of keys saved in this Record object.</td>
-    </tr>
-    <tr>
-        <td class="td"><strong>getId</strong></td>
-        <td class="td">none</td>
-        <td class="td">string</td>
-        <td class="td">Returns the record name stored in this Record object. Will search the database for a single
-                record that matches the arrayKeys field value combination and throw an exception if more or less than
-                one matching record is found. Exception types are NO_RECORD_ERROR and MULTIPLE_RECORD_ERROR.</td>
-    </tr>
-    <tr>
-        <td class="td"><strong>getProjectObject</strong></td>
-        <td class="td">none</td>
-        <td class="td">Project</td>
-        <td class="td">Returns the project object stored for this record.</td>
     </tr>
 </table>
 

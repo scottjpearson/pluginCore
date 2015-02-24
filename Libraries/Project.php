@@ -43,26 +43,26 @@ class Project {
 	}
 
 	# Publicly access the project metadata
-	public function getMetadata($columnName = "") {
+	public function getMetadata($fieldName = "") {
 		$this->fetchMetadata();
 
-		if($columnName == "") return $this->metadata;
+		if($fieldName == "") return $this->metadata;
 
-		return $this->metadata->getField($columnName);
+		return $this->metadata->getField($fieldName);
 	}
 
 	# Check the metadata to determine if a field is a checkbox
-	public function isCheckbox($columnName) {
+	public function isCheckbox($fieldName) {
 		$this->fetchMetadata();
 
-		return ($this->metadata->getField($columnName)->getElementType() == "checkbox");
+		return ($this->metadata->getField($fieldName)->getElementType() == "checkbox");
 	}
 
 	# Check the metadata to determine if a field is a checkbox
-	public function isDate($columnName) {
+	public function isDate($fieldName) {
 		$this->fetchMetadata();
 
-		return (strpos($this->metadata->getField($columnName)->getElementValidationType(), "date_") !== false);
+		return (strpos($this->metadata->getField($fieldName)->getElementValidationType(), "date_") !== false);
 	}
 
 	# Get the first field name from the metadata table
@@ -179,7 +179,7 @@ class Project {
 		if(!isset($this->recordList)) {
 			$sql = "SELECT DISTINCT d.record
 					FROM redcap_data d
-					WHERE d.project_id = {$this->projectId}
+					WHERE d.project_id = {$this->getProjectId()}
 					ORDER BY d.record";
 
 			if(!($result = db_query($sql))) throw new Exception("Failed to lookup record list\n".db_error());
@@ -192,25 +192,6 @@ class Project {
 		}
 
 		return $this->recordList;
-	}
-
-	public final function getRecords() {
-		$sql = "SELECT DISTINCT d.record
-				, d.field_name
-				, d.value
-				FROM redcap_data d
-				WHERE d.project_id = {$this->projectId}
-				ORDER BY d.record";
-
-		if(!($result = db_query($sql))) throw new Exception("Failed to lookup record list\n".db_error());
-
-		$results = array();
-		while( $row = db_fetch_assoc($result))
-		{
-			$results[] = $row;
-		}
-
-		return $results;
 	}
 
 	# Public function for fetching project ID and event ID from the database for a given project short code
@@ -235,7 +216,7 @@ class Project {
 	}
 
 	# Public function for converting enum field in metadata into raw or label values
-	public final static function renderEnumData($data, $enum, $rawOrLabel = "label") {
+	public final static function renderEnumData($value, $enum, $rawOrLabel = "label") {
 		// make sure that the \n's are also treated as line breaks
 		if (strpos($enum, "\\n")) {
 			$enum = str_replace("\\n", "\n", $enum);
@@ -244,13 +225,13 @@ class Project {
 		$select_array = explode("\n", $enum);
 		$newValue = "";
 
-		foreach ($select_array as $key => $value) {
-			if (strpos($value, ",")) {
-				$pos = strpos($value, ",");
-				$this_value = trim(substr($value, 0, $pos));
-				$this_text = trim(substr($value, $pos+1));
+		foreach ($select_array as $key => $enumValue) {
+			if (strpos($enumValue, ",")) {
+				$pos = strpos($enumValue, ",");
+				$this_value = trim(substr($enumValue, 0, $pos));
+				$this_text = trim(substr($enumValue, $pos+1));
 
-				if ($data == $this_value || $data == $this_text) {
+				if ($value == $this_value || $value == $this_text) {
 					if ($rawOrLabel == 'raw')
 						$newValue = $this_value;
 					else if ($rawOrLabel == 'label')
@@ -261,10 +242,10 @@ class Project {
 				}
 			}
 			else {
-				$value = trim($value);
+				$enumValue = trim($enumValue);
 
-				if ($data == $value) {
-					$newValue = $value;
+				if ($value == $enumValue) {
+					$newValue = $enumValue;
 					break;
 				}
 			}
