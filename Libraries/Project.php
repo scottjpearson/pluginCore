@@ -258,9 +258,9 @@ class Project {
 		$enumArray = array();
 
 		foreach(explode("\\n",$enum) as $enumRow) {
-			list($enumValue, $enumString) = explode(",",$enumRow);
+			list($enumValue) = explode(",",$enumRow);
+			$enumString = trim(substr($enumRow,strlen($enumValue)+1));
 			$enumValue = trim($enumValue);
-			$enumString = trim($enumString);
 
 			if($rawOrLabelKey == "raw") {
 				$enumArray[$enumValue] = $enumString;

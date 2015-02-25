@@ -3,7 +3,7 @@
 namespace Plugin;
 
 global $Core;
-$Core->Libraries("Collection");
+$Core->Libraries("MetadataCollection");
 
 class Metadata {
 	private static $tableName = "redcap_metadata";
@@ -468,13 +468,13 @@ class Metadata {
 				WHERE project_id = {$project->getProjectId()}
 				ORDER BY field_order";
 		$result = db_query($sql);
-		$col = new Collection();
+		$col = Array();
 		while ($row = db_fetch_assoc($result)) {
 			$item = new self();
 			foreach($row as $column => $value) {
 				$item->$column = $value;
 			}
-			$col->add($item);
+			$col[] = $item;
 		}
 		return $col;
 	}
@@ -495,7 +495,7 @@ class Metadata {
 			foreach($row as $column => $value) {
 				$item->$column = $value;
 			}
-			$col->add($item);
+			$col->append($item);
 		}
 		return $col;
 	}

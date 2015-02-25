@@ -1,9 +1,9 @@
 <?php
 namespace Plugin;
 global $Core;
-$Core->Libraries("Metadata","Collection");
+$Core->Libraries("Metadata");
 
-class MetadataCollection extends Collection {
+class MetadataCollection extends \ArrayObject {
 
 	/*
 	 * @return Metadata
