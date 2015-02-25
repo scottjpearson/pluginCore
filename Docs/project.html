@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Project Library Documentation</title>
+
+<style type='text/css' media='all'>@import url('./userguide.css');</style>
+<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+
+<meta http-equiv='expires' content='-1' />
+<meta http-equiv= 'pragma' content='no-cache' />
+<meta name='robots' content='all' />
+
+</head>
+<body>
+
+<!-- START NAVIGATION -->
+<div id="nav"><div id="nav_inner"></div></div>
+<div id="nav2"><a name="top">&nbsp;</a></div>
+<!-- END NAVIGATION -->
+
+
+<!-- START BREADCRUMB -->
+<!-- END BREADCRUMB -->
+
+<br clear="all" />
+
+
+<!-- START CONTENT -->
+<div id="content">
+
+
+<h1>Project Class</h1>
+
+<p>A class for accessing a single REDCap project.</p>
+
+<h2>Usage</h2>
+
+<p>A Project object is called as such
+    <code>$project = new Project($projectName);</code>
+    Project objects require a string <var>$projectName</var>. This string is the short code found in parenthesis at the end of a project's app_title.<br /><br />
+
+    For example, the project titled "PCORI Patient List (pcori_patient_list)" would be stored in a $project by calling the code below:
+
+    <code>$project = new Project("pcori_patient_list");</code></p>
+
+<h2>Object Function List</h2>
+
+<table cellpadding="0" cellspacing="1" border="0" style="width:100%" class="tableborder">
+    <tr>
+        <th>Function</th>
+        <th>Parameters</th>
+        <th>Return</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td class="td"><strong>getProjectName</strong></td>
+        <td class="td">none</td>
+        <td class="td">string</td>
+        <td class="td">Returns the project name stored in this Project object.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>getProjectId</strong></td>
+        <td class="td">none</td>
+        <td class="td">integer</td>
+        <td class="td">Returns the project ID stored in this Project object. Will search the database for the project
+                that matches the project name if the project ID has not been set yet.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>getEventId</strong></td>
+        <td class="td">none</td>
+        <td class="td">integer</td>
+        <td class="td">Returns the event ID stored in this Project object. Will search the database for the first event
+            ID associated with the stored project ID if the event ID has not been set yet.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>getMetadata</strong></td>
+        <td class="td">option string <var>$fieldName</var></td>
+        <td class="td">MetadataCollection or Metadata</td>
+        <td class="td">Returns either the entire collection of Metadata for the stored project ID or a single Metadata object
+            depending on if a $fieldName is provided.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>isCheckbox</strong></td>
+        <td class="td">string <var>$fieldName</var></td>
+        <td class="td">bool</td>
+        <td class="td">Checks the element type on the metadata table of the given field name. Returns true if the field is a checkbox.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>isDate</strong></td>
+        <td class="td">string <var>$fieldName</var></td>
+        <td class="td">bool</td>
+        <td class="td">Checks the element validation type on the metadata table of the given field name. Returns true if the field is restricted to a date format.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>getFirstFieldName</strong></td>
+        <td class="td">none</td>
+        <td class="td">string</td>
+        <td class="td">Looks at metadata table for the given project ID and returns the field name with a field order of 1.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>getAutoId</strong></td>
+        <td class="td">none</td>
+        <td class="td">integer</td>
+        <td class="td">Generates an auto-numbered record on the stored project ID, verifies that the record ID is unique
+            and then logs the record's creation before returning the new record ID.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>createNewAutoIdRecord</strong></td>
+        <td class="td">none</td>
+        <td class="td">Record</td>
+        <td class="td">Uses the getAutoId function to create a new record on this project and returns a record object pointed to that record.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>getUniqueRecordList</strong></td>
+        <td class="td">none</td>
+        <td class="td">array of strings</td>
+        <td class="td">Queries the database to find a unique list of record IDs associated with the stored project ID.</td>
+    </tr>
+</table>
+
+<h2>Static Function List</h2>
+
+<table cellpadding="0" cellspacing="1" border="0" style="width:100%" class="tableborder">
+    <tr>
+        <th>Function</th>
+        <th>Parameters</th>
+        <th>Return</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td class="td"><strong>getProjectAndEvent</strong></td>
+        <td class="td">string <var>$projectShortCode</var></td>
+        <td class="td">array(<br />&nbsp&nbsp"project_id" => integer,<br />&nbsp&nbsp"event_id" => integer<br />)</td>
+        <td class="td">Queries the database to find a project ID and the first event ID for that project based on the given short code.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>renderEnumData</strong></td>
+        <td class="td">string <var>$value</var>,<br />string <var>$enum</var>,<br />optional string $rawOrLabel<br />("raw" or "label")</td>
+        <td class="td">string</td>
+        <td class="td">Takes a <var>$value</var> from the redcap_data table and the element_enum (<var>$enum</var>) from the redcap_metadata
+            and converts the $value into the raw enum value or the enum label.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>convertEnumToArray</strong></td>
+        <td class="td">string <var>$enum</var>,<br />optional string $rawOrLabel<br />("raw" or "label")</td>
+        <td class="td">array</td>
+        <td class="td">Takes an element_enum (<var>$enum</var>) from the redcap_metadata
+            and converts it into an associative array in the format array("rawOrLabel" => "labelOrRaw").</td>
+    </tr>
+</table>
+
+<div id="footer">
+</div>
+
+</body>
+</html>

@@ -133,7 +133,7 @@ class Record {
 				if (!db_query($sql)) throw new Exception("Failed to update record details " . $sql, self::SQL_ERROR);
 
 				if (db_affected_rows() == 0) {
-					if ($value != "") {
+					if ($value !== "" && $value !== NULL) {
 						$insertStatements[] = "({$this->project->getProjectId()},{$this->project->getEventId()}," .
 							"'{$this->id}','$fieldName','" . db_real_escape_string($value) . "')";
 					}

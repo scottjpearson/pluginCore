@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Record Library Documentation</title>
+
+<style type='text/css' media='all'>@import url('./userguide.css');</style>
+<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+
+<meta http-equiv='expires' content='-1' />
+<meta http-equiv= 'pragma' content='no-cache' />
+<meta name='robots' content='all' />
+
+</head>
+<body>
+
+<!-- START NAVIGATION -->
+<div id="nav"><div id="nav_inner"></div></div>
+<div id="nav2"><a name="top">&nbsp;</a></div>
+<!-- END NAVIGATION -->
+
+
+<!-- START BREADCRUMB -->
+<!-- END BREADCRUMB -->
+
+<br clear="all" />
+
+
+<!-- START CONTENT -->
+<div id="content">
+
+
+<h1>Record Class</h1>
+
+<p>A class for accessing a single REDCap record.</p>
+
+<h2>Usage</h2>
+
+<p>A Record object is called as such 
+    <code>$record = new Record($projectObject, $keys, $keyValues);<br /><br />
+        
+        // Or call it with new objects<br />
+        $record = new Record(new Project("project_name"), <br />
+        &emsp;array(array("first_key"),array("second_key_p1","second_key_p2")), <br />
+        &emsp;array("second_key_p1" => "first_value", "second_key_p2" => "second_value"));</code>
+    Record objects require a <a href="project.html">Project</a> object <var>$projectObject</var><br />
+    The first array <var>$keys</var> stores the unique key list for the given project. This is more useful when extending the Record class.<br />
+    The second array <var>$keyValues</var> stores the specific key values to be used to find the record ID.</p>
+
+<h2>Object Function List</h2>
+
+<table cellpadding="0" cellspacing="1" border="0" style="width:100%" class="tableborder">
+    <tr>
+        <th>Function</th>
+        <th>Parameters</th>
+        <th>Return</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td class="td"><strong>getKeys</strong></td>
+        <td class="td">none</td>
+        <td class="td">Array</td>
+        <td class="td">Returns the 2D array of keys saved in this Record object.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>getId</strong></td>
+        <td class="td">none</td>
+        <td class="td">string</td>
+        <td class="td">Returns the record name stored in this Record object. Will search the database for a single
+            record that matches the arrayKeys field value combination and throw an exception if more or less than
+            one matching record is found. Exception types are NO_RECORD_ERROR and MULTIPLE_RECORD_ERROR.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>getProjectObject</strong></td>
+        <td class="td">none</td>
+        <td class="td">Project</td>
+        <td class="td">Returns the project object stored for this record.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>getDetails</strong></td>
+        <td class="td">optional string <var>$columnName</var></td>
+        <td class="td">string (with $columnName) or Array</td>
+        <td class="td">Will search for the details in the REDCap DB if necessary and return either all the fields
+                as an associative array or a string containing a single field's value.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>updateDetails</strong></td>
+        <td class="td">Array $newDetails</td>
+        <td class="td">Record $this</td>
+        <td class="td">Uses key => value pairs in $newDetails to INSERT/UPDATE redcap_data table with new values
+                including logging the changes to redcap_log_events and correctly handling check-boxes (can pass an
+                array of values to the check-box field). Also updates the stored details of the Record object with
+                the new values.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>setDetails</strong></td>
+        <td class="td">Array $newDetails</td>
+        <td class="td">none</td>
+        <td class="td">Uses key => value pairs in $newDetails to set the stored details of the Record object. Does not
+                query the database.</td>
+    </tr>
+</table>
+
+<h2>Static Function List</h2>
+
+<table cellpadding="0" cellspacing="1" border="0" style="width:100%" class="tableborder">
+    <tr>
+        <th>Function</th>
+        <th>Parameters</th>
+        <th>Return</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td class="td"><strong>createRecordFromId</strong></td>
+        <td class="td">Project <var>$project</var>,<br />string <var>$id</var></td>
+        <td class="td">Record</td>
+        <td class="td">Creates a new Record object and sets the $project and $id values. At this point, the record's details
+                can be the by using getDetails() which will pull the record details from the database or by using
+                setDetails() which will set the record details using the provided array. Using this function and setDetails
+                will allow many record objects to be created from a single database query.</td>
+    </tr>
+</table>
+
+<div id="footer">
+</div>
+
+</body>
+</html>

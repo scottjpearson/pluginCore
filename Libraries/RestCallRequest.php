@@ -15,6 +15,7 @@ class RestCallRequest
     protected $responseBody;
     protected $responseInfo;
     protected $usingFiles;
+	protected $forceJson = false;
 
     public function getAcceptType ()
     {
@@ -65,7 +66,7 @@ class RestCallRequest
         $this->verb = $verb;
     }
 
-    public function __construct ($url = null, $verb = 'GET', $requestBody = null)
+    public function __construct ($url = null, $verb = 'GET', $requestBody = null, $forceJson = false)
     {
         $this->url                                                             = $url;
         $this->verb                                                         = $verb;
@@ -76,6 +77,7 @@ class RestCallRequest
         $this->acceptType                           = 'text/xml';
         $this->responseBody                     = null;
         $this->responseInfo                       = null;
+		$this->forceJson = $forceJson;
 
         if ($this->requestBody !== null) {
             if ( isset($this->requestBody['file']) ) $this->usingFiles = true;
@@ -202,8 +204,12 @@ class RestCallRequest
         curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curlHandle, CURLOPT_HEADER, 0);
         curl_setopt($curlHandle, CURLOPT_VERBOSE, 0);
-        //curl_setopt($curlHandle, CURLOPT_HTTPHEADER, array("Accept: application/json"));
-        curl_setopt($curlHandle, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
+		if($this->forceJson) {
+	        curl_setopt($curlHandle, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
+		}
+		else {
+	        curl_setopt($curlHandle, CURLOPT_HTTPHEADER, array("Accept: application/json"));
+		}
     }
 
     protected function setAuth (&$curlHandle)
