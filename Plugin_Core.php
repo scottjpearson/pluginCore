@@ -57,7 +57,12 @@ class Plugin_Core
 		{
 			$this->includedLibraries[] = $library;
 			require_once( self::currentDirectory() . '/Libraries/' . $library . '.php' );
-			$this->$library = new $libaryNamespaceName();
+			try {
+				$this->$library = new $libaryNamespaceName();
+			}
+			catch(Exception $e) {
+
+			}
 
 			$return = true;
 		}
@@ -66,7 +71,12 @@ class Plugin_Core
         {
 			$this->includedLibraries[] = $library;
             require_once(__DIR__ . '/Libraries/' . $library . '.php' );
-			$this->$library = new $libaryNamespaceName();
+	        try {
+		        $this->$library = new $libaryNamespaceName();
+	        }
+	        catch(Exception $e) {
+
+	        }
 
             $return = true;
         }
