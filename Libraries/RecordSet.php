@@ -47,7 +47,7 @@ class RecordSet {
 	public function getRecordIds() {
 		$ids = array();
 
-		foreach($this->records as $record) {
+		foreach($this->getRecords() as $record) {
 			/* @var $record \Plugin\Record */
 			$ids[] = $record->getId();
 		}
