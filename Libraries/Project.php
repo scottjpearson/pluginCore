@@ -244,7 +244,7 @@ class Project {
 					ORDER BY p.project_id, e.event_id";
 
 		if ($row = db_fetch_assoc(db_query($sql))) {
-			return array($row["event_id"]);
+			return $row["event_id"];
 		}
 
 		return NULL;
