@@ -24,7 +24,9 @@ class Project {
 		$this->projectName = $projectName;
 		$this->metadata = new MetadataCollection();
 
-		$this->initializeProjectIds();
+		if($projectName != "") {
+			$this->initializeProjectIds();
+		}
 	}
 
 	# Publicly access the project name
@@ -194,6 +196,24 @@ class Project {
 		return $this->recordList;
 	}
 
+	/*
+	 * @return \Plugin\Project
+	 * @param $projectId Int
+	 */
+	public final static function createProjectFromId($projectId) {
+		$eventId = self::getEventFromId($projectId);
+
+		if($eventId != "") {
+			$projectObject = new \Plugin\Project(NULL);
+			$projectObject->projectId = $projectId;
+			$projectObject->eventId = $eventId;
+
+			return $projectObject;
+		}
+
+		return NULL;
+	}
+
 	# Public function for fetching project ID and event ID from the database for a given project short code
 	public final static function getProjectAndEvent($projectShortCode) {
 		while(strlen($projectShortCode) > 0) {
@@ -213,6 +233,21 @@ class Project {
 		}
 
 		return array(NULL, NULL);
+	}
+
+	public final static function getEventFromId($projectId) {
+		$sql = "SELECT e.event_id
+					FROM redcap_projects p, redcap_events_metadata e, redcap_events_arms a
+					WHERE p.project_id = '$projectId'
+						AND p.project_id = a.project_id
+						AND e.arm_id = a.arm_id
+					ORDER BY p.project_id, e.event_id";
+
+		if ($row = db_fetch_assoc(db_query($sql))) {
+			return array($row["event_id"]);
+		}
+
+		return NULL;
 	}
 
 	# Public function for converting enum field in metadata into raw or label values
