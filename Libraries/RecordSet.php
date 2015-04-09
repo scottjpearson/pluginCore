@@ -118,6 +118,27 @@ class RecordSet {
 
 		return $newRecordSet;
 	}
+	
+	public function sortRecords($fieldName, $reverseSort = false) {
+		$recordDetails = $this->getDetails($fieldName);
+		$currentRecordArray = $this->getRecords();
+		$newRecordArray = array();
+		
+		if($reverseSort) {
+			arsort($recordDetails);
+		}
+		else {
+			asort($recordDetails);
+		}
+		
+		foreach($recordDetails as $key => $value) {
+			$newRecordArray[] = $currentRecordArray[$key-1];
+		}
+		
+		$this->records = $newRecordArray;
+		
+		return $this->records;
+	}
 
 	protected function getFetchIdQueryResult() {
 		if(!isset($this->records)) {
@@ -144,7 +165,7 @@ class RecordSet {
 					"d$tableKey.project_id IN (" . implode(",",$this->projects->getProjectIds()) . ")\n" .
 					($tableKey == 0 ? "" : "AND d$tableKey.record = d1.record\n") .
 					"AND d$tableKey.field_name = '$key'\n" .
-					"AND d$tableKey.value $comparator '$value'";
+					"AND d$tableKey.value $comparator ".(is_array($value) ? "('".implode("','",$value)."')" : "'".$value."'");
 
 				$tableKey++;
 			}

@@ -36,9 +36,9 @@ class MetadataCollection extends \ArrayObject {
 		if($branchingLogic == "") {
 			return true;
 		}
-
+		
 		$newValue = preg_replace_callback("/(\\[)([a-z][a-z|_|0-9]*?)(\\])/",function($matches) use($recordDetails) {
-			return $recordDetails[$matches[2]];
+			return ($recordDetails[$matches[2]] == "" ? "''" : $recordDetails[$matches[2]]);
 		},$branchingLogic);
 		//$newValue = str_replace(" = "," == ",$newValue);
 		$newValue = str_replace(" or ",") || (",$newValue);

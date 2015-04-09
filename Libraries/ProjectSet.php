@@ -17,9 +17,14 @@ class ProjectSet {
 	 * @param Array $projectNames array of project names
 	 */
 	public function __construct($projectNames) {
-		$this->projects = array();
-		foreach($projectNames as $projectName) {
-			$this->projects[] = new Project($projectName);
+		if(is_array($projectNames)) {
+			$this->projects = array();
+			foreach($projectNames as $projectName) {
+				$this->projects[] = new Project($projectName);
+			}
+		}
+		else {
+			$this->projects = array($projectNames);
 		}
 	}
 
