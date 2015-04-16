@@ -87,22 +87,22 @@ class RecordSet {
 				}
 				switch($keyComparatorPair[1]) {
 					case ">":
-						$thisKeyMatches = ($value > $recordValue);
+						$thisKeyMatches = ($recordValue > $value);
 						break;
 					case "<":
-						$thisKeyMatches = ($value < $recordValue);
+						$thisKeyMatches = ($recordValue < $value);
 						break;
 					case "<=":
-						$thisKeyMatches = ($value <= $recordValue);
+						$thisKeyMatches = ($recordValue <= $value);
 						break;
 					case ">=":
-						$thisKeyMatches = ($value >= $recordValue);
+						$thisKeyMatches = ($recordValue >= $value);
 						break;
 					case "!=":
-						$thisKeyMatches = ($value != $recordValue);
+						$thisKeyMatches = ($recordValue != $value);
 						break;
 					default:
-						$thisKeyMatches = ($value == $recordValue);
+						$thisKeyMatches = ($recordValue == $value);
 				}
 
 				if(!$thisKeyMatches) {
@@ -114,6 +114,11 @@ class RecordSet {
 			if($recordMatches) {
 				$newRecordSet->addToRecordSet($potentialRecord);
 			}
+		}
+
+		# If nothing matches the new filters, set records equal to an empty array
+		if(!$newRecordSet->records) {
+			$newRecordSet->records = array();
 		}
 
 		return $newRecordSet;
