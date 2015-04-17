@@ -145,7 +145,7 @@ class Project {
 			# Delete, increment by a random integer and attempt to re-create the record
 			$sql = "DELETE FROM redcap_data
 					WHERE d.project_id = {$this->projectId}
-						AND d.record = '{$newIdDetails["record"]}
+						AND d.record = '{$newIdDetails["record"]}'
 						AND d.field_name = '{$newIdDetails["field_name"]}'
 					LIMIT 1";
 
