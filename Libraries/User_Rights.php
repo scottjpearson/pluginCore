@@ -105,7 +105,8 @@ class User_Rights {
 					WHERE project_id = " . $this->project->getProjectId() . "
 						AND username = '{$this->username}'";
 
-			if (!db_query($sql)) throw new Exception("ERROR - " . db_error(),self::$SQL_ERROR);
+			$query = db_query($sql);
+			if (!$query) throw new Exception("ERROR - " . db_error(),self::$SQL_ERROR);
 
 			## Need to create rights because none currently exist
 			if(db_num_rows($query) == 0) {
