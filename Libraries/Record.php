@@ -186,6 +186,10 @@ class Record {
 		}
 	}
 
+	public function checkCurrentRole() {
+		return $this->getUserRights()->role_name;
+	}
+
 	# Loops through the 2-dimensional $keys array to determine if $this->keyValues is a valid key for this project
 	protected function verifyKeyValues() {
 		if(count($this->keyValues) == 0) return false;
@@ -305,6 +309,14 @@ class Record {
 		}
 
 		return false;
+	}
+
+	protected function getUserRights() {
+		if(!isset($this->userRights)) {
+			$this->userRights = new User_Rights($this->getProjectObject(),USERID);
+		}
+
+		return $this->userRights;
 	}
 
 	# Alternate constructor that passes ID in manually

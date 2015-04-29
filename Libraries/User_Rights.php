@@ -14,6 +14,21 @@ use \Exception;
 # Class for looking up and editing a single user's rights on a project
 class User_Rights {
 	public static $SQL_ERROR = 1;
+	public static $DEFAULT_VALUES = array("lock_record" => 0,
+			"lock_record_multiform" => 0,
+			"data_export_tool" => 0,
+			"data_import_tool" => 0,
+			"data_comparison_tool" => 0,
+			"data_logging" => 0,
+			"file_repository" => 0,
+			"user_rights" => 0,
+			"design" => 0,
+			"data_access_groups" => 0,
+			"reports" => 0,
+			"calendar" => 0,
+			"data_entry" => "",
+			"record_create" => 0,
+			"participants" => 0);
 
 	# Columns
 	public $lock_record;
@@ -90,9 +105,23 @@ class User_Rights {
 					WHERE project_id = " . $this->project->getProjectId() . "
 						AND username = '{$this->username}'";
 
-			//echo $sql;
+			if (!db_query($sql)) throw new Exception("ERROR - " . db_error(),self::$SQL_ERROR);
 
-			if (!db_query($sql)) throw new Exception("ERROR - " . db_error());
+			## Need to create rights because none currently exist
+			if(db_num_rows($query) == 0) {
+				## Set default values is fields aren't specified
+				foreach(self::$DEFAULT_VALUES as $fieldName => $defaultValue) {
+					if(!isset($newRights[$fieldName])) {
+						$newRights[$fieldName] = $defaultValue;
+					}
+				}
+
+				$sql = "INSERT INTO redcap_user_rights
+						(".implode(",",array_keys($newRights)).") VALUES
+						('".implode("','",$newRights)."')";
+
+				if (!db_query($sql)) throw new Exception("ERROR - " . db_error()."\n".$sql,self::$SQL_ERROR);
+			}
 		}
 	}
 
@@ -137,7 +166,7 @@ class User_Rights {
 			$newRights['data_entry'] .= "'";
 		}
 
-		foreach(get_object_vars(new User_Rights(null,null)) as $fieldName => $value) {
+		foreach(self::$DEFAULT_VALUES as $fieldName => $value) {
 			if(in_array($fieldName,array("project","username","roleId"))) continue;
 
 			if(!isset($newRights[$fieldName]) || $newRights[$fieldName] == "") {
