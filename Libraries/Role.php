@@ -8,7 +8,7 @@
 namespace Plugin;
 
 include_once("Project.php");
-include_once("User_Rights.php");
+include_once( "UserRights.php" );
 
 use \Exception;
 
@@ -49,7 +49,7 @@ class Role {
 
 		if($this->project->getProjectId() != "") {
 			$sql = "UPDATE redcap_user_roles
-					SET ".User_Rights::getSetRightsSql($newRights,$this->project)."
+					SET ".UserRights::getSetRightsSql($newRights,$this->project)."
 					WHERE project_id = " . $this->project->getProjectId() . "
 						AND role_id = '{$this->roleId}'";
 

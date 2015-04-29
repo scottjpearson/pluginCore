@@ -12,7 +12,7 @@ include_once("Project.php");
 use \Exception;
 
 # Class for looking up and editing a single user's rights on a project
-class User_Rights {
+class UserRights {
 	public static $SQL_ERROR = 1;
 	public static $DEFAULT_VALUES = array("lock_record" => 0,
 			"lock_record_multiform" => 0,
@@ -197,7 +197,7 @@ class User_Rights {
 			<option value='User_Rights'>User</option>
 		</select></td></tr>
 		<tr id='userSelect'><td>User:</td><td>";
-		$userList = User_Rights::getUsersByProject($project);
+		$userList = UserRights::getUsersByProject($project);
 
 		foreach($userList as $username) {
 			echo "<input type='checkbox' name='user[]' value='$username' />$username<br />";

@@ -4,7 +4,7 @@ namespace Plugin;
 
 use \Exception;
 
-$GLOBALS["Core"]->Libraries(array("Project","Core"));
+$GLOBALS["Core"]->Libraries(array("Project","Core","UserRights"));
 
 # Class for looking up and editing a single record on a given project
 class Record {
@@ -313,7 +313,7 @@ class Record {
 
 	protected function getUserRights() {
 		if(!isset($this->userRights)) {
-			$this->userRights = new User_Rights($this->getProjectObject(),USERID);
+			$this->userRights = new UserRights($this->getProjectObject(),USERID);
 		}
 
 		return $this->userRights;
