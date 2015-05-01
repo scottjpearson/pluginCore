@@ -71,7 +71,7 @@ class RecordSet {
 	public function filterRecords($keyValues) {
 		/* @var $potentialRecord \Plugin\Record */
 		$this->fetchDetails();
-		$newRecordSet = new RecordSet($this->projects,$this->keyValues);
+		$newRecordSet = new self($this->projects,$this->keyValues);
 
 		foreach($this->records as $potentialRecord) {
 			$recordMatches = true;
