@@ -50,6 +50,11 @@ class UserRights {
 	public $dag_name;
 	public $role_id;
 	public $group_id;
+	public $user_email;
+	public $user_firstname;
+	public $user_lastname;
+	public $super_user;
+	public $allow_create_db;
 	private $project;
 	private $username;
 
@@ -57,6 +62,26 @@ class UserRights {
 		$this->project = $project;
 		$this->username = $username;
 
+		## Lookup user's information
+		if($username != "") {
+			$sql = "SELECT i.user_email, i.user_firstname, i.user_lastname, i.super_user, i.allow_create_db
+					FROM redcap_user_information i
+					WHERE i.username = '$username'";
+
+			$query = db_query($sql);
+			if(!$query) throw new \Exception("Error looking up user information", self::$SQL_ERROR);
+
+			if($row = db_fetch_assoc($query)) {
+				## Set all the variables
+				$this->user_email = $row["user_email"];
+				$this->user_firstname = $row["user_firstname"];
+				$this->user_lastname = $row["user_lastname"];
+				$this->super_user = $row["super_user"];
+				$this->allow_create_db = $row["allow_create_db"];
+			}
+		}
+
+		## Lookup user's role, role_rights and user_rights
 		if($project != NULL && $username != "") {
 			$sql = "SELECT u.expiration, u.role_id, u.group_id, d.group_name, r.role_name,
 						u.lock_record, u.lock_record_multiform, u.data_export_tool, u.data_import_tool, u.data_comparison_tool,
@@ -123,6 +148,15 @@ class UserRights {
 
 				if (!db_query($sql)) throw new Exception("ERROR - " . db_error()."\n".$sql,self::$SQL_ERROR);
 			}
+		}
+	}
+
+	public static function getCurrentUserRights(Project $project) {
+		if(defined("USERID")) {
+			return new self($project, USERID);
+		}
+		else {
+			return null;
 		}
 	}
 
