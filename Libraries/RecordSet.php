@@ -34,7 +34,6 @@ class RecordSet {
 			$projectSet = new \Plugin\ProjectSet(array());
 			$projectSet->addProjectToSet($projects);
 			$this->projects = $projectSet;
-			echo "Used Project Versiom <br />";
 		}
 		$this->keyValues = $keyValues;
 	}
