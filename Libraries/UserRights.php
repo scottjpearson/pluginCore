@@ -58,7 +58,13 @@ class UserRights {
 	private $project;
 	private $username;
 
-	public function __construct(Project $project, $username) {
+	/**
+	 * @param Project|NULL $project
+	 * @param String $username
+	 *
+	 * @throws Exception
+	 */
+	public function __construct($project, $username) {
 		$this->project = $project;
 		$this->username = $username;
 

@@ -21,19 +21,20 @@ class RecordSet {
 	private $keyValues;
 
 	/**
-	 * @param ProjectSet $projects ProjectSet object linking to the Redcap projects
+	 * @param ProjectSet|Project $projects ProjectSet or Project object linking to the Redcap projects
 	 * @param array $keyValues array containing the actual key values for a particular record
 	 */
-	public function __construct(ProjectSet $projects, $keyValues) {
+	public function __construct($projects, $keyValues) {
 		//debug_print_backtrace();
 		//echo get_class($projects). "<br /><br /><br />";
-		if(get_class($projects) == "Plugin\ProjectSet") {
+		if(get_class($projects) == "Plugin\\ProjectSet") {
 			$this->projects = $projects;
 		}
-		else if(get_class($projects) == "Plugin\Project") {
+		else if(get_class($projects) == "Plugin\\Project") {
 			$projectSet = new \Plugin\ProjectSet(array());
 			$projectSet->addProjectToSet($projects);
 			$this->projects = $projectSet;
+			echo "Used Project Versiom <br />";
 		}
 		$this->keyValues = $keyValues;
 	}

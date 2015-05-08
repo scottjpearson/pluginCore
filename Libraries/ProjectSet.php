@@ -14,7 +14,7 @@ class ProjectSet {
 	const INVALID_PROJECT = 2;
 
 	/**
-	 * @param Array $projectNames array of project names
+	 * @param Array|string $projectNames array of project names
 	 */
 	public function __construct($projectNames) {
 		if(is_array($projectNames)) {
