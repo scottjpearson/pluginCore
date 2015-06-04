@@ -10,7 +10,7 @@ $Core->Helpers(array("cleanupSurveyParticipantsBySurveyRecord"));
 
 class Passthru {
 
-	public static function passthruToSurvey(\Plugin\Record $record, $surveyFormName = "") {
+	public static function passthruToSurvey(\Plugin\Record $record, $surveyFormName = "", $dontCreateForm = false) {
 		// Get survey_id, form status field, and save and return setting
 		$sql = "SELECT s.survey_id, s.form_name, s.save_and_return
 		 		FROM redcap_projects p, redcap_surveys s, redcap_metadata m
@@ -76,7 +76,7 @@ class Passthru {
 			# Since response_id does NOT exist yet, create it.
 			$returnCode = generateRandomHash();
 			$sql = "INSERT INTO redcap_surveys_response (participant_id, record, first_submit_time, return_code)
-					VALUES ($participantId, ".$record->getId().", '".date('Y-m-d h:m:s')."', '$returnCode')";
+					VALUES ($participantId, ".$record->getId().", '".date('Y-m-d h:m:s')."', ".($dontCreateForm ? "NULL" : '$returnCode').")";
 
 			if(!db_query($sql)) echo "Error: ".db_error()." <br />";
 		}
@@ -107,17 +107,23 @@ class Passthru {
 		$surveyLink = APP_PATH_SURVEY_FULL . "?s=$hash";
 		//echo "$surveyLink ~ $returnCode<br />";
 
-		## Build invisible self-submitting HTML form to get the user to the survey
 		@db_query("COMMIT");
-		echo "<html><body>
-			<form name='form' action='$surveyLink' method='POST' enctype='multipart/form-data'>
-			<input type='hidden' value='$returnCode' name='__code'/>
-			</form>
-			<script type='text/javascript'>
-				document.form.submit();
-			</script>
-			</body>
-			</html>";
-		exit;
+		
+		if($dontCreateForm) {
+			return $surveyLink;
+		}
+		else {
+			## Build invisible self-submitting HTML form to get the user to the survey
+			echo "<html><body>
+				<form name='form' action='$surveyLink' method='POST' enctype='multipart/form-data'>
+				<input type='hidden' value='$returnCode' name='__code'/>
+				</form>
+				<script type='text/javascript'>
+					document.form.submit();
+				</script>
+				</body>
+				</html>";
+			exit;
+		}
 	}
 } 
