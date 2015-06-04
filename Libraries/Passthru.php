@@ -24,7 +24,8 @@ class Passthru {
 		$q = db_query($sql);
 		$surveyFormName = db_result($q, 0, 'form_name');
 		$surveyId = db_result($q, 0, 'survey_id');
-
+		$surveyAlreadyStarted = false;
+		
 		// Set the response as incomplete in the data table
 		$sql = "UPDATE redcap_data
 				SET value = '0'
@@ -36,6 +37,7 @@ class Passthru {
 		$q = db_query($sql);
 		// Log the event (if value changed)
 		if ($q && db_affected_rows() > 0) {
+			$surveyAlreadyStarted = true;
 			log_event($sql,"redcap_data","UPDATE",$record,"{$surveyFormName}_complete = '0'","Update record");
 		}
 
@@ -74,9 +76,17 @@ class Passthru {
 			$participantId = db_insert_id();
 
 			# Since response_id does NOT exist yet, create it.
-			$returnCode = generateRandomHash();
+			if(!$dontCreateForm) {
+				$returnCode = "'".generateRandomHash()."'";
+				$firstSubmitDate = "'".date('Y-m-d h:m:s')."'";
+			}
+			else {
+				$returnCode = "NULL";
+				$firstSubmitDate = "NULL";
+			}
+			
 			$sql = "INSERT INTO redcap_surveys_response (participant_id, record, first_submit_time, return_code)
-					VALUES ($participantId, ".$record->getId().", '".date('Y-m-d h:m:s')."', ".($dontCreateForm ? "NULL" : '$returnCode').")";
+					VALUES ($participantId, ".$record->getId().", $firstSubmitDate,$returnCode)";
 
 			if(!db_query($sql)) echo "Error: ".db_error()." <br />";
 		}
@@ -95,14 +105,16 @@ class Passthru {
 			$hash = $queryResults['hash'];
 		}
 
-		// Set the response as incomplete in the response table
-		$sql = "UPDATE redcap_surveys_participants p, redcap_surveys_response r
-				SET r.completion_time = null
-				WHERE p.survey_id = $surveyId
-					AND p.event_id = ".$record->getProjectObject()->getEventId()."
-					AND r.participant_id = p.participant_id
-					AND r.record = '".$record->getId()."' ";
-		db_query($sql);
+		if(!$dontCreateForm) {
+			// Set the response as incomplete in the response table
+			$sql = "UPDATE redcap_surveys_participants p, redcap_surveys_response r
+					SET r.completion_time = null
+					WHERE p.survey_id = $surveyId
+						AND p.event_id = ".$record->getProjectObject()->getEventId()."
+						AND r.participant_id = p.participant_id
+						AND r.record = '".$record->getId()."' ";
+			db_query($sql);
+		}
 
 		$surveyLink = APP_PATH_SURVEY_FULL . "?s=$hash";
 		//echo "$surveyLink ~ $returnCode<br />";
