@@ -76,7 +76,7 @@ class Passthru {
 			$participantId = db_insert_id();
 
 			# Since response_id does NOT exist yet, create it.
-			if($surveyAlreadyStarted) {
+			if(!$dontCreateForm) {
 				$returnCode = "'".generateRandomHash()."'";
 				$firstSubmitDate = "'".date('Y-m-d h:m:s')."'";
 			}
@@ -127,8 +127,9 @@ class Passthru {
 		else {
 			## Build invisible self-submitting HTML form to get the user to the survey
 			echo "<html><body>
-				<form name='form' action='$surveyLink' method='".($returnCode == "NULL" ? "get" : "post")."' enctype='multipart/form-data'>
-				".($returnCode == "NULL" ? "<input type='hidden' value='$hash' name='s' />" : "<input type='hidden' value='$returnCode' name='__code'/>")."
+				<form name='form' action='$surveyLink' method='post' enctype='multipart/form-data'>
+				".($returnCode == "NULL" ? "" : "<input type='hidden' value='$returnCode' name='__code'/>")."
+				<input type='hidden' value='1' name='__prefill' />
 				</form>
 				<script type='text/javascript'>
 					document.form.submit();
