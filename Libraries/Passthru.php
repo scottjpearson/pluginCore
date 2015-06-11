@@ -20,7 +20,7 @@ class Passthru {
 						AND s.form_name = m.form_name
 						".($surveyFormName != "" ? "AND s.form_name = '$surveyFormName'" : "")
 					."LIMIT 1";
-
+		
 		$q = db_query($sql);
 		$surveyFormName = db_result($q, 0, 'form_name');
 		$surveyId = db_result($q, 0, 'survey_id');
@@ -33,7 +33,7 @@ class Passthru {
 					AND record = '".$record->getId()."'
 					AND event_id = ".$record->getProjectObject()->getEventId()."
 					AND field_name = '{$surveyFormName}_complete'";
-
+					
 		$q = db_query($sql);
 		// Log the event (if value changed)
 		if ($q && db_affected_rows() > 0) {
@@ -71,12 +71,12 @@ class Passthru {
 			# Since participant_id does NOT exist yet, create it.
 			$sql = "INSERT INTO redcap_surveys_participants (survey_id, event_id, participant_email, participant_identifier, hash)
 					VALUES ($surveyId, ".$record->getProjectObject()->getEventId().", '', null, '$hash')";
-
+			
 			if(!db_query($sql)) echo "Error: ".db_error()." <br />";
 			$participantId = db_insert_id();
 
 			# Since response_id does NOT exist yet, create it.
-			if(!$dontCreateForm) {
+			if($surveyAlreadyStarted) {
 				$returnCode = "'".generateRandomHash()."'";
 				$firstSubmitDate = "'".date('Y-m-d h:m:s')."'";
 			}
@@ -87,7 +87,7 @@ class Passthru {
 			
 			$sql = "INSERT INTO redcap_surveys_response (participant_id, record, first_submit_time, return_code)
 					VALUES ($participantId, ".$record->getId().", $firstSubmitDate,$returnCode)";
-
+			
 			if(!db_query($sql)) echo "Error: ".db_error()." <br />";
 		}
 		# Find the existing participant and response for this record
@@ -98,7 +98,7 @@ class Passthru {
 				WHERE p.survey_id = '$surveyId'
 					AND p.participant_id = r.participant_id
 					AND r.record = '".$record->getId()."'";
-
+			
 			$queryResults = db_fetch_assoc(db_query($sql));
 
 			$returnCode = $queryResults['return_code'];
@@ -127,8 +127,8 @@ class Passthru {
 		else {
 			## Build invisible self-submitting HTML form to get the user to the survey
 			echo "<html><body>
-				<form name='form' action='$surveyLink' method='POST' enctype='multipart/form-data'>
-				<input type='hidden' value='$returnCode' name='__code'/>
+				<form name='form' action='$surveyLink' method='".($returnCode == "NULL" ? "get" : "post")."' enctype='multipart/form-data'>
+				".($returnCode == "NULL" ? "<input type='hidden' value='$hash' name='s' />" : "<input type='hidden' value='$returnCode' name='__code'/>")."
 				</form>
 				<script type='text/javascript'>
 					document.form.submit();
