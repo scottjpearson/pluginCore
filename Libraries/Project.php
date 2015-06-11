@@ -144,9 +144,9 @@ class Project {
 		while(db_num_rows($result) > 1) {
 			# Delete, increment by a random integer and attempt to re-create the record
 			$sql = "DELETE FROM redcap_data
-					WHERE d.project_id = {$this->projectId}
-						AND d.record = '{$newIdDetails["record"]}'
-						AND d.field_name = '{$newIdDetails["field_name"]}'
+					WHERE project_id = {$this->projectId}
+						AND record = '{$newIdDetails["record"]}'
+						AND field_name = '{$newIdDetails["field_name"]}'
 					LIMIT 1";
 
 			if(!db_query($sql)) throw new Exception("Error Deleting Duplicate Auto ID ".$sql,self::SQL_ERROR);

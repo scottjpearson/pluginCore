@@ -25,8 +25,6 @@ class RecordSet {
 	 * @param array $keyValues array containing the actual key values for a particular record
 	 */
 	public function __construct($projects, $keyValues) {
-		//debug_print_backtrace();
-		//echo get_class($projects). "<br /><br /><br />";
 		if(get_class($projects) == "Plugin\\ProjectSet") {
 			$this->projects = $projects;
 		}
@@ -167,8 +165,8 @@ class RecordSet {
 
 				$fromClause .= ($fromClause == "" ? "\nFROM " : ", ") . "redcap_data d" . $tableKey;
 				$whereClause .= ($whereClause == "" ? "\nWHERE " : "\nAND ") .
-					"d$tableKey.project_id IN (" . implode(",",$this->projects->getProjectIds()) . ")\n" .
-					($tableKey == 0 ? "" : "AND d$tableKey.record = d1.record\n") .
+					($tableKey == 1 ? "d$tableKey.project_id IN (" . implode(",",$this->projects->getProjectIds()) . ")\n" : "d$tableKey.project_id = d1.project_id\n") .
+					($tableKey == 1 ? "" : "AND d$tableKey.record = d1.record\n") .
 					"AND d$tableKey.field_name = '$key'\n" .
 					"AND d$tableKey.value $comparator ".(is_array($value) ? "('".implode("','",$value)."')" : "'".$value."'");
 
@@ -188,7 +186,6 @@ class RecordSet {
 	protected function fetchRecords() {
 		if(!isset($this->records) && $this->keyValues != "") {
 			$result = $this->getFetchIdQueryResult();
-
 			$this->records = array();
 
 			while($row = db_fetch_assoc($result)) {
@@ -208,7 +205,7 @@ class RecordSet {
 		if(!$this->detailsFetched) {
 			$whereString = "";
 			foreach($this->getRecords() as $record ) {
-				$whereString .= ($whereString == "" ? "" : " OR ")."(d.record = ".$record->getId()." AND d.project_id = ".
+				$whereString .= ($whereString == "" ? "" : " OR ")."(d.record = '".$record->getId()."' AND d.project_id = ".
 					$record->getProjectObject()->getProjectId().")";
 			}
 
