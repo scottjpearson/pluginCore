@@ -14,6 +14,8 @@ class RecordSet {
 	const INVALID_PROJECT = 2;
 	const KEY_COMPARATOR_SEPARATOR = "~";
 
+	public $caseSensitive;
+
 	protected $projects;
 	protected $records;
 	protected $detailsFetched = false;
@@ -24,7 +26,7 @@ class RecordSet {
 	 * @param ProjectSet|Project $projects ProjectSet or Project object linking to the Redcap projects
 	 * @param array $keyValues array containing the actual key values for a particular record
 	 */
-	public function __construct($projects, $keyValues) {
+	public function __construct($projects, $keyValues, $caseSensitive = true) {
 		if(get_class($projects) == "Plugin\\ProjectSet") {
 			$this->projects = $projects;
 		}
@@ -34,6 +36,8 @@ class RecordSet {
 			$this->projects = $projectSet;
 		}
 		$this->keyValues = $keyValues;
+
+		$this->caseSensitive = $caseSensitive;
 	}
 
 	# Publicly access the record ID for the record
@@ -143,6 +147,39 @@ class RecordSet {
 		return $this->records;
 	}
 
+	/**
+	 * @param $newRecords \Plugin\RecordSet|Array
+	 */
+	public function appendRecords($newRecords) {
+		$this->fetchRecords();
+
+		if(is_array($newRecords)) {
+			if($this->detailsFetched) {
+				/** @var \Plugin\Record $tempRecord */
+				foreach($newRecords as $tempRecord) {
+					$tempRecord->getDetails();
+				}
+			}
+		}
+		else {
+			if($this->detailsFetched) {
+				$newRecords->getDetails();
+			}
+			$newRecords = $newRecords->getRecords();
+		}
+
+		foreach($newRecords as $tempRecord) {
+			### Check if this record already exists; Append it if it doesn't
+			foreach($this->getRecords() as $duplicateRecord) {
+				if($tempRecord->getProjectObject()->getProjectId() == $duplicateRecord->getProjectObject()->getProjectId() &&
+						$tempRecord->getId() == $duplicateRecord->getId()) {
+					continue 2;
+				}
+			}
+			$this->records[] = $tempRecord;
+		}
+	}
+
 	protected function getFetchIdQueryResult() {
 		if(!isset($this->records)) {
 			$this->records = array();
@@ -167,7 +204,7 @@ class RecordSet {
 				$whereClause .= ($whereClause == "" ? "\nWHERE " : "\nAND ") .
 					($tableKey == 1 ? "d$tableKey.project_id IN (" . implode(",",$this->projects->getProjectIds()) . ")\n" : "d$tableKey.project_id = d1.project_id\n") .
 					($tableKey == 1 ? "" : "AND d$tableKey.record = d1.record\n") .
-					"AND d$tableKey.field_name = '$key'\n" .
+					($this->caseSensitive ? "AND d$tableKey.field_name = '$key'\n" : "AND LOWER(d$tableKey.field_name) = '".strtolower($key)."'\n").
 					"AND d$tableKey.value $comparator ".(is_array($value) ? "('".implode("','",$value)."')" : "'".$value."'");
 
 				$tableKey++;
