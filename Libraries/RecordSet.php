@@ -70,7 +70,7 @@ class RecordSet {
 		$this->records[] = $newRecord;
 	}
 
-	public function filterRecords($keyValues) {
+	public function filterRecords($keyValues, $caseSensitive = true) {
 		/* @var $potentialRecord \Plugin\Record */
 		$this->fetchDetails();
 		$newRecordSet = new self($this->projects,$this->keyValues);
@@ -87,6 +87,12 @@ class RecordSet {
 					$recordValue = strtotime($recordValue);
 					$value = strtotime($value);
 				}
+
+				if(!$caseSensitive) {
+					$recordValue = strtolower($recordValue);
+					$value = strtolower($value);
+				}
+
 				switch($keyComparatorPair[1]) {
 					case ">":
 						$thisKeyMatches = ($recordValue > $value);
@@ -102,6 +108,9 @@ class RecordSet {
 						break;
 					case "!=":
 						$thisKeyMatches = ($recordValue != $value);
+						break;
+					case "like":
+						$thisKeyMatches = (strpos($recordValue,$value) === false ? 0 : 1);
 						break;
 					default:
 						$thisKeyMatches = ($recordValue == $value);
