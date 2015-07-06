@@ -23,8 +23,11 @@ class ProjectSet {
 				$this->projects[] = new Project($projectName);
 			}
 		}
+		else if($projectNames != "") {
+			$this->projects = new Project($projectNames);
+		}
 		else {
-			$this->projects = array($projectNames);
+			$this->projects = array();
 		}
 	}
 
@@ -37,7 +40,9 @@ class ProjectSet {
 	public function getProjectIds() {
 		$ids = array();
 
-		foreach($this->projects as $project) {
+		foreach($this->projects as $key => $project) {
+			if($project == NULL) { echo "Project Error on project Key $key <Br />" ; continue; }
+
 			/* @var $project Project */
 			if($project->getProjectId() == "") throw new Exception("Instrument Project doesn't exist ".$project->getProjectName(), self::INVALID_PROJECT);
 			$ids[] = $project->getProjectId();

@@ -57,6 +57,9 @@ class Record {
 	public function getDetails($columnName = "", $forceRefresh = false) {
 		$this->fetchDetails($forceRefresh);
 
+		### Allow array_search results to directly be input into getDetails
+		if($columnName === false) return "";
+
 		if($columnName == "") return $this->details;
 
 		return $this->details[$columnName];

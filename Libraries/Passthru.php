@@ -125,6 +125,7 @@ class Passthru {
 			return $surveyLink;
 		}
 		else {
+			//echo "Return $returnCode ~ $surveyLink <br />";
 			## Build invisible self-submitting HTML form to get the user to the survey
 			echo "<html><body>
 				<form name='form' action='$surveyLink' method='post' enctype='multipart/form-data'>
