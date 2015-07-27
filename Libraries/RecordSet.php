@@ -89,8 +89,8 @@ class RecordSet {
 		return $this->projects;
 	}
 
-	public function getDetails($columnName = "") {
-		return $this->fetchDetails($columnName);
+	public function getDetails($columnName = "", $getIds = false) {
+		return $this->fetchDetails($columnName, $getIds);
 	}
 
 	public function addToRecordSet(Record $newRecord) {
@@ -175,7 +175,7 @@ class RecordSet {
 		}
 		
 		foreach($recordDetails as $key => $value) {
-			$newRecordArray[] = $currentRecordArray[$key-1];
+			$newRecordArray[] = $currentRecordArray[$key];
 		}
 		
 		$this->records = $newRecordArray;
@@ -269,7 +269,7 @@ class RecordSet {
 		return $this->records;
 	}
 
-	protected function fetchDetails($columnName = "") {
+	protected function fetchDetails($columnName = "", $getIds = false) {
 		/* @var $record \Plugin\Record */
 		if(count($this->getRecords()) == 0) return NULL;
 
@@ -299,9 +299,14 @@ class RecordSet {
 		}
 		
 		$returnArray = array();
-		
+
 		foreach($this->fetchRecords() as $record) {
-			$returnArray[$record->getId()] = $record->getDetails($columnName);
+			if($getIds) {
+				$returnArray[$record->getProjectObject()->getProjectId()][$record->getId()] = $record->getDetails($columnName);
+			}
+			else {
+				$returnArray[] = $record->getDetails($columnName);
+			}
 		}
 		
 		return $returnArray;
