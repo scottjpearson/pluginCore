@@ -23,7 +23,7 @@ class RecordSet {
 	private $keyValues;
 
 	/**
-	 * @param ProjectSet|Project $projects ProjectSet or Project object linking to the Redcap projects
+	 * @param ProjectSet|Project|Array $projects ProjectSet, Project objects or array of project names/ids linking to the Redcap projects
 	 * @param array $keyValues array containing the actual key values for a particular record
 	 */
 	public function __construct($projects, $keyValues, $caseSensitive = true) {
@@ -33,6 +33,33 @@ class RecordSet {
 		else if(get_class($projects) == "Plugin\\Project") {
 			$projectSet = new \Plugin\ProjectSet(array());
 			$projectSet->addProjectToSet($projects);
+			$this->projects = $projectSet;
+		}
+		else if(is_array($projects)) {
+			$projectSet = new \Plugin\ProjectSet(array());
+
+			foreach($projects as $tempProject) {
+				if(is_numeric($tempProject)) {
+					$newProject = Project::createProjectFromId($tempProject);
+				}
+				else {
+					$newProject = new Project($tempProject);
+				}
+				$foundProject = true;
+
+				try {
+					if($newProject->getProjectId() == "") {
+						$foundProject = false;
+					}
+				}
+				catch(Exception $e) {
+					$foundProject = false;
+				}
+
+				if($foundProject) {
+					$projectSet->addProjectToSet($newProject);
+				}
+			}
 			$this->projects = $projectSet;
 		}
 		$this->keyValues = $keyValues;
@@ -255,18 +282,18 @@ class RecordSet {
 					$record->getProjectObject()->getProjectId().")";
 			}
 
-			$sql = "SELECT d.record, d.field_name, d.value
+			$sql = "SELECT d.project_id, d.record, d.field_name, d.value
 					FROM redcap_data d
 					WHERE $whereString";
 
 			if(!$result = db_query($sql)) throw new Exception("Error looking up RecordSet details",self::SQL_ERROR);
 
 			while($row = db_fetch_assoc($result)) {
-				$detailsArray[$row["record"]][$row["field_name"]] = $row["value"];
+				$detailsArray[$row['project_id']][$row["record"]][$row["field_name"]] = $row["value"];
 			}
 
 			foreach($this->fetchRecords() as $record) {
-				$record->setDetails($detailsArray[$record->getId()]);
+				$record->setDetails($detailsArray[$record->getProjectObject()->getProjectId()][$record->getId()]);
 			}
 			$this->detailsFetched = true;
 		}

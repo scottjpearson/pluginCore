@@ -67,6 +67,13 @@ class Record {
 
 	# Make changes to the record's values. Safely inserts values and logs any changes
 	# Checkboxes will need to be inserted as an array containing the new list of checked values
+	/**
+	 * @param $changes
+	 * @param bool $skipUnchangedValues
+	 *
+	 * @return $this
+	 * @throws Exception
+	 */
 	public function updateDetails($changes, $skipUnchangedValues = true) {
 		if(!isset($this->details)) return false;
 
