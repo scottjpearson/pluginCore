@@ -20,8 +20,18 @@ class Project {
 	protected $metadata;
 	protected $recordList;
 
+	/**
+	 * @param $projectName string|integer
+	 */
 	public function __construct($projectName) {
-		$this->projectName = $projectName;
+		## Can't be a short code, so must be a project ID
+		if(is_numeric($projectName)) {
+			$this->projectName = "";
+			$this->projectId = $projectName;
+		}
+		else {
+			$this->projectName = $projectName;
+		}
 		$this->metadata = new MetadataCollection();
 
 		if($projectName != "") {
