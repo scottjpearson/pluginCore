@@ -5,7 +5,7 @@ namespace Plugin;
 use \Exception;
 
 global $Core;
-$Core->Libraries(array("ProjectSet","Record"));
+$Core->Libraries(array("ProjectSet","Record"),false);
 
 # Class for looking up and editing a group of records for a given project
 class RecordSet {

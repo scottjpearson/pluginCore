@@ -1,7 +1,7 @@
 <?php
 namespace Plugin;
 global $Core;
-$Core->Libraries("Metadata");
+$Core->Libraries("Metadata",false);
 
 class MetadataCollection extends \ArrayObject {
 

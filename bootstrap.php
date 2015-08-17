@@ -7,7 +7,7 @@ if(class_exists("Plugin_Core",false)) {
 include_once('Plugin_Core.php');
 
 if(!$doNotLoad) {
-	$Core = new Plugin_Core();
+	$GLOBALS['Core'] = new Plugin_Core();
 }
 
 

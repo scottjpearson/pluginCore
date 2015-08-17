@@ -5,7 +5,7 @@ namespace Plugin;
 use \Exception;
 
 global $Core;
-$Core->Libraries(array("Project"));
+$Core->Libraries(array("Project"),false);
 
 # Class for looking up a group of project IDs at once
 class ProjectSet {

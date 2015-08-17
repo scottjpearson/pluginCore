@@ -65,14 +65,25 @@ class UserRights {
 	 * @throws Exception
 	 */
 	public function __construct($project, $username) {
-		$this->project = $project;
-		$this->username = $username;
+		if($project) {
+			$this->project = $project;
+		}
+		else {
+			$this->project = "";
+		}
+
+		if($username) {
+			$this->username = $username;
+		}
+		else {
+			$this->username = "";
+		}
 
 		## Lookup user's information
-		if($username != "") {
+		if($this->username != "") {
 			$sql = "SELECT i.user_email, i.user_firstname, i.user_lastname, i.super_user, i.allow_create_db
 					FROM redcap_user_information i
-					WHERE i.username = '$username'";
+					WHERE i.username = '{$this->username}'";
 
 			$query = db_query($sql);
 			if(!$query) throw new \Exception("Error looking up user information", self::$SQL_ERROR);
@@ -88,7 +99,7 @@ class UserRights {
 		}
 
 		## Lookup user's role, role_rights and user_rights
-		if($project != NULL && $username != "") {
+		if($this->project != "" && $this->username != "") {
 			$sql = "SELECT u.expiration, u.role_id, u.group_id, d.group_name, r.role_name,
 						u.lock_record, u.lock_record_multiform, u.data_export_tool, u.data_import_tool, u.data_comparison_tool,
 						u.data_logging, u.file_repository, u.user_rights, u.design, u.data_access_groups, u.reports, u.calendar,

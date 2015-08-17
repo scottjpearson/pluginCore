@@ -4,7 +4,7 @@ namespace Plugin;
 
 use \Exception;
 
-$GLOBALS["Core"]->Libraries(array("Project","Core","UserRights"));
+$GLOBALS["Core"]->Libraries(array("Project","Core","UserRights"),false);
 
 # Class for looking up and editing a single record on a given project
 class Record {

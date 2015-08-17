@@ -5,7 +5,7 @@ namespace Plugin;
 use \Exception;
 
 global $Core;
-$Core->Libraries(array("Record"));
+$Core->Libraries(array("Record"),false);
 $Core->Helpers(array("cleanupSurveyParticipantsBySurveyRecord"));
 
 class Passthru {

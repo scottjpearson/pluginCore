@@ -47,7 +47,7 @@ class Plugin_Core
         if( !$success ) die( "Error loading Core::Libraries ({$message})" );
     }
     
-    private function loadLibrary( $library = '' )
+    private function loadLibrary( $library = '', $preloadInstance = true)
     {
         $return = false;
 		$libaryNamespaceName = "\\Plugin\\$library";
@@ -57,11 +57,13 @@ class Plugin_Core
 		{
 			$this->includedLibraries[] = $library;
 			require_once( self::currentDirectory() . '/Libraries/' . $library . '.php' );
-			try {
-				$this->$library = new $libaryNamespaceName();
-			}
-			catch(Exception $e) {
+			if($preloadInstance) {
+				try {
+					$this->$library = new $libaryNamespaceName();
+				}
+				catch(Exception $e) {
 
+				}
 			}
 
 			$return = true;
@@ -71,12 +73,14 @@ class Plugin_Core
         {
 			$this->includedLibraries[] = $library;
             require_once(__DIR__ . '/Libraries/' . $library . '.php' );
-	        try {
-		        $this->$library = new $libaryNamespaceName();
-	        }
-	        catch(Exception $e) {
+			if($preloadInstance) {
+				try {
+					$this->$library = new $libaryNamespaceName();
+				}
+				catch(Exception $e) {
 
-	        }
+				}
+			}
 
             $return = true;
         }

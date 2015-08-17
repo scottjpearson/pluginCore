@@ -3,7 +3,7 @@
 namespace Plugin;
 
 global $Core;
-$Core->Libraries("MetadataCollection");
+$Core->Libraries("MetadataCollection",false);
 
 class Metadata {
 	private static $tableName = "redcap_metadata";

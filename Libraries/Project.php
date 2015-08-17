@@ -2,7 +2,7 @@
 /** Author: Kyle McGuffin */
 namespace Plugin;
 
-$GLOBALS["Core"]->Libraries(array("Record","Core","MetadataCollection"));
+$GLOBALS["Core"]->Libraries(array("Record","Core","MetadataCollection"),false);
 
 use \Exception;
 
