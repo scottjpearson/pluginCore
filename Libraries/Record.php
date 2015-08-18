@@ -75,7 +75,7 @@ class Record {
 	 * @throws Exception
 	 */
 	public function updateDetails($changes, $skipUnchangedValues = true) {
-		if(!isset($this->details)) return false;
+		if(!isset($this->details)) $this->fetchDetails();
 
 		$insertStatements = array();
 		$logText = "";
