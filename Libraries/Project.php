@@ -28,6 +28,7 @@ class Project {
 		if(is_numeric($projectName)) {
 			$this->projectName = "";
 			$this->projectId = $projectName;
+			$this->eventId = self::getEventFromId($projectId);
 		}
 		else {
 			$this->projectName = $projectName;
