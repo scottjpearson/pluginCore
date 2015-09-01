@@ -4,7 +4,7 @@ class Plugin_Core
 {
 	private $includedLibraries = array();
 
-    public function Libraries( $libraries = array() )
+    public function Libraries( $libraries = array() , $preloadInstance = true)
     {
         $success = true;
         $message = '';
@@ -19,7 +19,7 @@ class Plugin_Core
 					continue;
 				}
 
-                if(!self::loadLibrary( $library ))
+                if(!self::loadLibrary( $library , $preloadInstance))
                 {
                     $success = false;
                     $message = $library;
@@ -32,7 +32,7 @@ class Plugin_Core
 			if(in_array($libraries,$this->includedLibraries)) {
 				return;
 			}
-            if( !self::loadLibrary( $libraries ) )
+            if( !self::loadLibrary( $libraries , $preloadInstance) )
             {
                 $success = false;
                 $message = $libraries;

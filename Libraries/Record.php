@@ -27,10 +27,10 @@ class Record {
 	 * @param array $keys 2-dimensional array containing all the unique keys of the project ex: array(array("participant_id"),array("study_id","event"))
 	 * @param array $keyValues array containing the actual key values for a particular record
 	 */
-	public function __construct(Project $project, $keys, $keyValues) {
-		$this->project = $project;
-		$this->keys = $keys;
-		$this->keyValues = $keyValues;
+	public function __construct($project, $keys, $keyValues) {
+		$this->project = ($project == NULL ? "" : $project);
+		$this->keys = ($keys == NULL ? "" : $keys);
+		$this->keyValues = ($keyValues == NULL ? "" : $keyValues);
 
 		if(!$this->verifyKeyValues()) {
 			unset($this->keyValues);
