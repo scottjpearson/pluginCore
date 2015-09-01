@@ -17,7 +17,7 @@ class Rdws {
 
     private $rdURL;
 
-    function doRequest( $params = '', $application = '', $token = '', $useTestURL = false )
+    function doRequest( $params = '', $useTestURL = false, $application = '', $token = '' )
     {
         if( $useTestURL )
         {
