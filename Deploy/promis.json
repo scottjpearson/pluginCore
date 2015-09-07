@@ -1,0 +1,30 @@
+{
+	"git":"git@git.assembla.com:victr-dots.promisd.git",
+	"devDir":"c:\\xampp\\htdocs\\redcap\\plugins\\promis\\",
+	"stagingDir":"/app001/www/redcap/plugins/promis_dashboard/",
+	"prodDir":"/app001/www/redcap/plugins/promis_dashboard/",
+	"requiredFields":
+	{
+		"random_id":
+		{
+			"fieldType":"text",
+			"fieldLabel":"Random ID",
+			"instrumentName":"record_data"
+		},
+		"prior_count":
+		{
+			"fieldType":"text",
+			"fieldLabel":"Current Survey Count",
+			"instrumentName":"record_data",
+			"validationType":"int"
+		},
+		"already_completed":
+		{
+			"fieldType":"yesno",
+			"fieldLabel":"Previously Completed Survey",
+			"instrumentName":"record_data"
+		}
+	},
+	"excludedFiles":["",
+		""]
+}
