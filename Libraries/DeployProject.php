@@ -8,6 +8,8 @@
 
 namespace Plugin;
 
+global $Core;
+$Core->Libraries(array("Project"));
 
 class DeployProject extends Project {
 
@@ -38,7 +40,7 @@ class DeployProject extends Project {
 							SET field_order = (field_order - 1)
 							WHERE project_id = ".$this->getProjectId()."
 								AND field_order > ".$currentMetadata->getFieldOrder();
-
+//					echo "$sql <br /><br />";
 					db_query($sql);
 					if($e = db_error()) echo "Error moving metadata field order $e<br />\n$sql";
 				}
@@ -46,11 +48,12 @@ class DeployProject extends Project {
 				## Get the last field number to appear on the new form
 				$sql = "SELECT field_order
 						FROM redcap_metadata
-						WHERE field_name = '".$fieldMetadata->getFormName()."'
+						WHERE form_name = '".$fieldMetadata->getFormName()."'
 							AND project_id = ".$this->getProjectId()."
 						ORDER BY field_order DESC
 						LIMIT 1";
 
+//				echo "$sql <br /><br />";
 				$newMetadataUpdate["field_order"] = db_result(db_query($sql),0);
 
 				if($newMetadataUpdate["field_order"] <= 0) continue;
@@ -61,15 +64,19 @@ class DeployProject extends Project {
 						WHERE project_id = ".$this->getProjectId()."
 							AND field_order > ".$newMetadataUpdate["field_order"];
 
+//				echo "$sql <br /><br />";
+				db_query($sql);
+				if($e = db_error()) echo "Error moving metadata field order $e<br />\n$sql";
+
 				$newMetadataUpdate["field_order"]++;
 			}
 
 			if($currentMetadata->getFieldName() == "") {
-				$sql = "INSERT INTO redcap_data (project_id, field_name, ".implode(",",array_keys($newMetadataUpdate)).")
-						VALUES (".$this->getProjectId().", ".$fieldMetadata->getFieldName().",".implode(",",$newMetadataUpdate).")";
+				$sql = "INSERT INTO redcap_metadata (project_id, field_name, ".implode(",",array_keys($newMetadataUpdate)).")
+						VALUES (".$this->getProjectId().", '".$fieldMetadata->getFieldName()."',".implode(",",$newMetadataUpdate).")";
 			}
 			else {
-				$sql = "UPDATE redcap_data d SET ";
+				$sql = "UPDATE redcap_metadata d SET ";
 				foreach($newMetadataUpdate as $fieldName => $value) {
 					$sql .= "$fieldName = $value,";
 				}
@@ -77,6 +84,7 @@ class DeployProject extends Project {
 				$sql .= " WHERE d.project_id = ".$this->getProjectId()." AND d.field_name = '".$fieldMetadata->getFieldName()."'";
 			}
 
+//			echo "$sql <br /><br />";
 			db_query($sql);
 			if($e = db_error()) echo "Error inserting/updating field $e<Br />\n$sql";
 		}
