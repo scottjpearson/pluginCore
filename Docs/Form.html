@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Core::Rdws</title>
+
+    <style type='text/css' media='all'>@import url('./userguide.css');</style>
+    <link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+
+    <meta http-equiv='expires' content='-1' />
+    <meta http-equiv= 'pragma' content='no-cache' />
+    <meta name='robots' content='all' />
+
+</head>
+<body>
+
+<!-- START NAVIGATION -->
+<div id="nav"><div id="nav_inner"></div></div>
+<div id="nav2"><a name="top">&nbsp;</a></div>
+<!-- END NAVIGATION -->
+
+
+<!-- START BREADCRUMB -->
+<!-- END BREADCRUMB -->
+
+<br clear="all" />
+
+
+<!-- START CONTENT -->
+<div id="content">
+
+
+    <h1>Form</h1>
+
+    <p>Used to assist with repopulating forms..</p>
+
+    <p class="important"><strong>Dependencies:</strong>&nbsp;  <kbd>None</kbd></p>
+
+    <p>Features:</p>
+
+    <ul>
+        <li>repopulate_checkbox_radio</li>
+        <li>repopulate_text</li>
+    </ul>
+
+    <h2>repopulate_checkbox_radio( $name = '', $value='', $post = array(), $return = TRUE )</h2>
+
+    <p>
+        Takes the <b>$name</b> of a checkbox or radio button and the <b>$value</b> set
+        for the input.  Looks in the <b>$post</b> array to see if <b>$post[$name] === $value</b>
+        if so it will mark the input as checked.
+    </p>
+
+    <code>
+
+        require_once '../Core/bootstrap.php';<br/>
+        $Core->Libraries(array( 'Form' ));<br/><br/>
+
+        // Set the radio input patGender to checked if the value is 'Male'
+        <br/>
+        <br/>
+        &lt;label&gt;
+        &lt;input type="radio" name="patGender" value="Male"
+        &lt;?=Plugin\Form::repopulate_checkbox_radio('patGender','Male',$_REQUEST);?&gt; /&gt;
+        Male
+        &lt;/label&gt;
+    </code>
+
+
+    <h2>repopulate_text( $name = '', $post = array(), $return = TRUE )</h2>
+
+    <p>
+        Takes the <b>$name</b> of a form field and an array of <b>$post</b> values, which should
+        contain the <b>$name</b> as an array key.  This function <b>RETURNS</b> the value
+        of the array element found at key <b>$name</b>.
+    </p>
+
+    <code>
+
+        require_once '../Core/bootstrap.php';<br/>
+        $Core->Libraries(array( 'Form' ));<br/><br/>
+
+        // Set the value of the patAge input to the value $_REQUEST['patAge']; if exists.
+        <br/>
+        <br/>
+        &lt;input style="width: 100px;" type="text" class="form-control" name="patAge" placeholder=""
+               value="<b>&lt;?Plugin\Form::repopulate_text('patAge',$_REQUEST);&gt;</b>" /&gt;
+    </code>
+
+</div>
+<!-- END CONTENT -->
+
+
+<div id="footer">
+</div>
+
+</body>
+</html>
