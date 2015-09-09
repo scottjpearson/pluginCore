@@ -71,6 +71,8 @@ class DeployProject extends Project {
 				$newMetadataUpdate["field_order"]++;
 			}
 
+			if(count($newMetadataUpdate) == 0) continue;
+
 			if($currentMetadata->getFieldName() == "") {
 				$sql = "INSERT INTO redcap_metadata (project_id, field_name, ".implode(",",array_keys($newMetadataUpdate)).")
 						VALUES (".$this->getProjectId().", '".$fieldMetadata->getFieldName()."',".implode(",",$newMetadataUpdate).")";
