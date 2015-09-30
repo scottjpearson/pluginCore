@@ -38,6 +38,10 @@ class Project {
 		if($projectName != "") {
 			$this->initializeProjectIds();
 		}
+		else {
+			$this->projectId = "";
+			$this->eventId = "";
+		}
 	}
 
 	# Publicly access the project name

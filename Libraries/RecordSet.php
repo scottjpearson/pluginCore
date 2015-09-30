@@ -312,6 +312,12 @@ class RecordSet {
 		return $returnArray;
 	}
 
+	/**
+	 * @param $keyName string
+	 * @param $comparator string
+	 *
+	 * @return string
+	 */
 	public static function getKeyComparatorPair($keyName, $comparator) {
 		return $keyName.self::KEY_COMPARATOR_SEPARATOR.$comparator;
 	}

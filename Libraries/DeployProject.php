@@ -53,8 +53,21 @@ class DeployProject extends Project {
 						ORDER BY field_order DESC
 						LIMIT 1";
 
+				## If form doesn't exist, append to end of project
+				$q = db_query($sql);
+
+				if(db_num_rows($q) == 0) {
+					$sql = "SELECT field_order
+							FROM redcap_metadata
+							WHERE project_id = ".$this->getProjectId()."
+							ORDER BY field_order DESC
+							LIMIT 1";
+					$q = db_query($sql);
+					if($e = db_error()) echo "Error $e: $sql<br />";
+				}
+
 //				echo "$sql <br /><br />";
-				$newMetadataUpdate["field_order"] = db_result(db_query($sql),0);
+				$newMetadataUpdate["field_order"] = db_result($q,0);
 
 				if($newMetadataUpdate["field_order"] <= 0) continue;
 
@@ -70,7 +83,6 @@ class DeployProject extends Project {
 
 				$newMetadataUpdate["field_order"]++;
 			}
-
 			if(count($newMetadataUpdate) == 0) continue;
 
 			if($currentMetadata->getFieldName() == "") {
