@@ -26,8 +26,16 @@ class Rdws {
             $this->rdURL = 'https://biovu2.vanderbilt.edu/rdws/redcap/data/?app='.$application.'&token='.$token;
         }
         global $Core;
+		/** @var \Plugin\RestCallRequest $request */
         $request = new $Core->RestCallRequest($this->rdURL, 'POST', $params, true);
         $request->execute();
-        return json_decode( $request->getResponseBody() ) ;
+
+		$response = $request->getResponseInfo();
+
+		if($response["http_code"] == 500) {
+			return array();
+		}
+
+        return json_decode($request->getResponseBody());
     }
 }
