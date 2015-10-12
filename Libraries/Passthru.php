@@ -128,12 +128,12 @@ class Passthru {
 			//echo "Return $returnCode ~ $surveyLink <br />";
 			## Build invisible self-submitting HTML form to get the user to the survey
 			echo "<html><body>
-				<form name='form' action='$surveyLink' method='post' enctype='multipart/form-data'>
+				<form name='passthruform' action='$surveyLink' method='post' enctype='multipart/form-data'>
 				".($returnCode == "NULL" ? "" : "<input type='hidden' value='$returnCode' name='__code'/>")."
 				<input type='hidden' value='1' name='__prefill' />
 				</form>
 				<script type='text/javascript'>
-					document.form.submit();
+					document.passthruform.submit();
 				</script>
 				</body>
 				</html>";
