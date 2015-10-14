@@ -121,6 +121,16 @@ class Project {
 		}
 	}
 
+    # Determine if a record exists on the current project
+    public final function recordExists( $record_id = NULL )
+    {
+        if( $record_id === NULL ) return false;
+
+        $sql = "SELECT record FROM redcap_data WHERE project_id = {$this->projectId} AND record = '{$record_id}' LIMIT 1";
+        $result = db_query($sql);
+        return ( $result->num_rows ) ? TRUE : FALSE;
+    }
+
 	# Pull the next auto ID for the project and save it
 	public final function getAutoId() {
 
