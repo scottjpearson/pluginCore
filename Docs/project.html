@@ -118,6 +118,18 @@
         <td class="td">array of strings</td>
         <td class="td">Queries the database to find a unique list of record IDs associated with the stored project ID.</td>
     </tr>
+    <tr>
+        <td class="td"><strong>recordExists</strong></td>
+        <td class="td">string <var>$record_id</var></td>
+        <td class="td">bool</td>
+        <td class="td">Determines if a record with the <var>$record_id</var> exists on the project. Returns <var>TRUE</var> if record exists.</td>
+    </tr>
+    <tr>
+        <td class="td"><strong>lockRecordForForm</strong></td>
+        <td class="td">[string <var>$form</var>, array <var>$form</var>]<br />string <var>$record_id</var></td>
+        <td class="td">bool</td>
+        <td class="td">Given an array of <var>$form</var> names or a single form name; will lock the <var>$record_id</var> on that form. </td>
+    </tr>
 </table>
 
 <h2>Static Function List</h2>

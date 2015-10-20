@@ -131,6 +131,37 @@ class Project {
         return ( $result->num_rows ) ? TRUE : FALSE;
     }
 
+    ## Allows the user to lock a form or (forms) on the project for a given record
+    public final function lockRecordForForm( $form = NULL, $record = NULL )
+    {
+        ## Get out of here
+        if( $record === NULL ) return false;
+
+        if(is_array($form)) {
+            foreach($form as $formName)
+            {
+                $this->lockRecordForForm($formName, $record);
+            }
+        }
+        else if( is_string($form) )
+        {
+            $sql = "INSERT INTO redcap_locking_data (project_id, record, event_id, form_name, timestamp)";
+            $sql .= "VALUES ";
+            $sql .= "('".$this->getProjectId()."'";
+            $sql .= ", '".$record."'";
+            $sql .= ", '".$this->getEventId()."'";
+            $sql .= ", '".$form."'";
+            $sql .= ", NOW()";
+            $sql .= ")";
+
+            if(!($result = db_query($sql))) throw new Exception("Failed to lock form\n".db_error());
+
+            return true;
+        }
+
+        return false;
+    }
+
 	# Pull the next auto ID for the project and save it
 	public final function getAutoId() {
 
