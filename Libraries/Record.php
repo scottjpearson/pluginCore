@@ -132,6 +132,10 @@ class Record {
 					$logSql .= $insertSql;
 					$logText .= "{$fieldName}(".implode(") = checked\n{$fieldName}(",$deleteValues).") = checked\n";
 				}
+
+				if(count($insertValues) > 0 || count($deleteValues) > 0) {
+					$updateCount++;
+				}
 			}
 			else {
 				$sql = "UPDATE redcap_data
