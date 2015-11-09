@@ -82,10 +82,14 @@ class Record {
 		$logSql = "";
 		$logType = "";
 		$updateCount = 0;
+		$newRecord = false;
 
 		foreach($changes as $fieldName => $value) {
 			# Skip values that already match $this->details
-			if($skipUnchangedValues && $this->details[$fieldName] === $value) continue;
+			if($skipUnchangedValues && ($this->details[$fieldName] === $value || ($this->details[$fieldName] == $value && is_numeric($this->details[$fieldName]) && is_numeric($value)))) continue;
+
+			# Special === handling for bool(false) and "" values
+			if($this->details[$fieldName] == "" && $value === false) continue;
 
 			# For checkboxes, review the list of values before determining what to save
 			if($this->project->isCheckbox($fieldName)) {
@@ -148,6 +152,9 @@ class Record {
 
 				if (db_affected_rows() == 0) {
 					if ($value !== "" && $value !== NULL) {
+						# Check if inserting first field, to know if this is a new record
+						if($fieldName == $this->project->getFirstFieldName()) $newRecord = true;
+
 						$insertStatements[] = "({$this->project->getProjectId()},{$this->project->getEventId()}," .
 							"'{$this->id}','$fieldName','" . db_real_escape_string($value) . "')";
 					}
@@ -167,7 +174,7 @@ class Record {
 			if(!db_query($sql)) throw new Exception("Couldn't create Instrument record ".$sql, self::INSERT_ERROR);
 		}
 
-		if($changes[$this->project->getFirstFieldName()] != "" && $updateCount == 0 && count($insertStatements) > 0) {
+		if($newRecord && $updateCount == 0 && count($insertStatements) > 0) {
 			$logType = "INSERT";
 			$logDescription = "Creating Record";
 		}
