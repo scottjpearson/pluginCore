@@ -145,6 +145,16 @@ class Project {
         }
         else if( is_string($form) )
         {
+			## Clear locking from the form ahead of time to prevent duplicates
+			$sql = "DELETE FROM redcap_locking_data
+					WHERE project_id = ".$this->getProjectId()."
+					AND record = '".$record."'
+					AND form_name = '".$form."'
+					AND event_id = ".$this->getEventId();
+
+			if(!($result = db_query($sql))) throw new Exception("Failed to unlock form\n".db_error());
+
+
             $sql = "INSERT INTO redcap_locking_data (project_id, record, event_id, form_name, timestamp)";
             $sql .= "VALUES ";
             $sql .= "('".$this->getProjectId()."'";
