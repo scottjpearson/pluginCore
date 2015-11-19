@@ -74,7 +74,7 @@ class Project {
 	public function getFieldList($formName = "") {
 		$this->fetchFieldsAndForms();
 
-		if($formName == "") return array_keys(array_intersect($this->fieldList, array($formName)));
+		if($formName != "") return array_keys(array_intersect($this->fieldList, array($formName)));
 
 		return array_keys($this->fieldList);
 	}
