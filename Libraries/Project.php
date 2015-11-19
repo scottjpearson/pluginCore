@@ -18,6 +18,8 @@ class Project {
 	private $projectId;
 	private $eventId;
 	protected $metadata;
+	protected $fieldList;
+	protected $formList;
 	protected $recordList;
 
 	/**
@@ -68,6 +70,22 @@ class Project {
 		return $this->metadata->getField($fieldName);
 	}
 
+	# Get list of fields existing on this project
+	public function getFieldList($formName = "") {
+		$this->fetchFieldsAndForms();
+
+		if($formName == "") return array_keys(array_intersect($this->fieldList, array($formName)));
+
+		return array_keys($this->fieldList);
+	}
+
+	# Get list of forms existing on this project
+	public function getFormList() {
+		$this->fetchFieldsAndForms();
+
+		return $this->formList;
+	}
+
 	# Check the metadata to determine if a field is a checkbox
 	public function isCheckbox($fieldName) {
 		$this->fetchMetadata();
@@ -112,6 +130,49 @@ class Project {
 		}
 
 		return $this->metadata;
+	}
+
+	# Lookup field list if metadata hasn't been pulled
+	protected function fetchFieldsAndForms() {
+		if(count($this->fieldList) == 0) {
+			$this->fieldList = array();
+			$this->formList = array();
+
+			if(count($this->metadata) == 0) {
+				## Pull form and field list from redcap DB
+				$sql = "SELECT field_name, form_name
+						FROM redcap_metadata
+						WHERE project_id = ".$this->getProjectId();
+
+				$q = db_query($sql);
+
+				if(!$q) echo "Error looking up fields<br />".db_error()."<br />".$sql."<br />";
+
+				$this->fieldList = array();
+				$this->formList = array();
+
+				## Fill in fieldList and formList from query results
+				while($row = db_fetch_assoc($q)) {
+					$this->fieldList[$row["field_name"]] = $row["form_name"];
+					if(!isset($this->formList[$row["form_name"]])) {
+						$this->formList[$row["form_name"]] = count($this->formList);
+					}
+				}
+			}
+			else {
+				## Fill in fieldList and formList from metadata
+				foreach($this->metadata as $metadataRow) {
+					$this->fieldList[$metadataRow->getFieldName()] = $metadataRow->getFormName();
+
+					if(!isset($this->formList[$metadataRow->getFormName()])) {
+						$this->formList[$metadataRow->getFormName()] = 1;
+					}
+				}
+			}
+
+			## Faster to do isset above (over in_array) for large arrays, so we flip the array once the array is filled
+			$this->formList = array_keys($this->formList);
+		}
 	}
 
 	# Look up this project's project ID if that hasn't been done already
