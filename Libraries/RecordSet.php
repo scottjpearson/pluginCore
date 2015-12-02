@@ -244,7 +244,7 @@ class RecordSet {
 					($tableKey == 1 ? "" : "AND d$tableKey.record = d1.record\n") .
 					"AND d$tableKey.field_name = '$key'\n".
 					($this->caseSensitive ? "AND d$tableKey.value $comparator ".(is_array($value) ? "('".implode("','",$value)."')" : "'".$value."'") :
-						"AND LOWER(d$tableKey.value) $comparator ".strtolower(is_array($value) ? "'".implode("','",$value)."')" : "'".$value."'"));
+						"AND LOWER(d$tableKey.value) $comparator ".strtolower(is_array($value) ? "('".implode("','",$value)."')" : "'".$value."'"));
 
 				$tableKey++;
 			}
