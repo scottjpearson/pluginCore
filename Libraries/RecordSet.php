@@ -22,6 +22,8 @@ class RecordSet {
 
 	private $keyValues;
 
+	public static $debugSql = false;
+
 	/**
 	 * @param ProjectSet|Project|Array $projects ProjectSet, Project objects or array of project names/ids linking to the Redcap projects
 	 * @param array $keyValues array containing the actual key values for a particular record
@@ -240,13 +242,18 @@ class RecordSet {
 				$whereClause .= ($whereClause == "" ? "\nWHERE " : "\nAND ") .
 					($tableKey == 1 ? "d$tableKey.project_id IN (" . implode(",",$this->projects->getProjectIds()) . ")\n" : "d$tableKey.project_id = d1.project_id\n") .
 					($tableKey == 1 ? "" : "AND d$tableKey.record = d1.record\n") .
-					($this->caseSensitive ? "AND d$tableKey.field_name = '$key'\n" : "AND LOWER(d$tableKey.field_name) = '".strtolower($key)."'\n").
-					"AND d$tableKey.value $comparator ".(is_array($value) ? "('".implode("','",$value)."')" : "'".$value."'");
+					"AND d$tableKey.field_name = '$key'\n".
+					($this->caseSensitive ? "AND d$tableKey.value $comparator ".(is_array($value) ? "('".implode("','",$value)."')" : "'".$value."'") :
+						"AND LOWER(d$tableKey.value) $comparator ".strtolower(is_array($value) ? "'".implode("','",$value)."')" : "'".$value."'"));
 
 				$tableKey++;
 			}
 
 			$sql = $baseSql . $fromClause . $whereClause;
+
+			if(self::$debugSql) {
+				echo "RecordSet SQL: <br />\n$sql<br />";
+			}
 
 			if (!($result = db_query($sql))) throw new Exception("Failed to lookup record IDs $sql", self::SQL_ERROR);
 
