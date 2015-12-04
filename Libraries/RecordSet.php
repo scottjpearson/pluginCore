@@ -166,6 +166,39 @@ class RecordSet {
 
 		return $newRecordSet;
 	}
+
+	/**
+	 * @param $project int|string|\Plugin\Project
+	 *
+	 * @return \Plugin\RecordSet
+	 */
+	public function filterByProject($project) {
+		$projectID = "";
+		if ($project == ""){
+			return "";
+		} else if (get_class($project) == "Plugin\\Project"){
+			$projectID = $project->getProjectId();
+		} else if (gettype($project) == "string"){
+			$projectObj = new \Plugin\Project($project);
+			$projectID = $projectObj->getProjectId();
+		} else if (is_numeric($project)){
+			$projectID = $project;
+		}
+
+		$newRecordSet = new self($this->projects,$this->keyValues);
+
+		foreach($this->getRecords() as $record){
+			if ($record->getProjectObject()->getProjectId() == $projectID){
+				$newRecordSet->addToRecordSet($record);
+			}
+		}
+
+		if(!$newRecordSet->records){
+			$newRecordSet->records = array();
+		}
+
+		return $newRecordSet;
+	}
 	
 	public function sortRecords($fieldName, $reverseSort = false) {
 		$recordDetails = $this->getDetails($fieldName);
