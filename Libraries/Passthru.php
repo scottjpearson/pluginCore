@@ -10,6 +10,12 @@ $Core->Helpers(array("cleanupSurveyParticipantsBySurveyRecord"));
 
 class Passthru {
 
+	/**
+	 * @param \Plugin\Record $record
+	 * @param string $surveyFormName
+	 * @param bool $dontCreateForm
+	 * @return string
+	 */
 	public static function passthruToSurvey(\Plugin\Record $record, $surveyFormName = "", $dontCreateForm = false) {
 		// Get survey_id, form status field, and save and return setting
 		$sql = "SELECT s.survey_id, s.form_name, s.save_and_return
@@ -19,8 +25,8 @@ class Passthru {
 						AND m.project_id = p.project_id
 						AND s.form_name = m.form_name
 						".($surveyFormName != "" ? "AND s.form_name = '$surveyFormName'" : "")
-					."LIMIT 1";
-		
+					." LIMIT 1";
+
 		$q = db_query($sql);
 		$surveyFormName = db_result($q, 0, 'form_name');
 		$surveyId = db_result($q, 0, 'survey_id');
@@ -33,7 +39,7 @@ class Passthru {
 					AND record = '".$record->getId()."'
 					AND event_id = ".$record->getProjectObject()->getEventId()."
 					AND field_name = '{$surveyFormName}_complete'";
-					
+
 		$q = db_query($sql);
 		// Log the event (if value changed)
 		if ($q && db_affected_rows() > 0) {
@@ -125,7 +131,7 @@ class Passthru {
 			return $surveyLink;
 		}
 		else {
-			//echo "Return $returnCode ~ $surveyLink <br />";
+//			echo "Return $returnCode ~ $surveyLink <br />";
 			## Build invisible self-submitting HTML form to get the user to the survey
 			echo "<html><body>
 				<form name='passthruform' action='$surveyLink' method='post' enctype='multipart/form-data'>
@@ -137,7 +143,7 @@ class Passthru {
 				</script>
 				</body>
 				</html>";
-			exit;
+			return false;
 		}
 	}
 } 

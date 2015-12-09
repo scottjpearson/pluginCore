@@ -22,9 +22,14 @@ class RecordSet {
 
 	private $keyValues;
 
+	public static $debugSql = false;
+
 	/**
 	 * @param ProjectSet|Project|Array $projects ProjectSet, Project objects or array of project names/ids linking to the Redcap projects
-	 * @param array $keyValues array containing the actual key values for a particular record
+	 * @param array $keyValues array containing the actual key values for a particular record format is array($fieldName => $fieldValue),
+	 * by default, all fieldName => fieldValue pairs must appear in for the record to be included in the RecordSet. Alternatively,
+	 * the getKeyComparatorPair static function can be used to add >,<,!=,IN,NOT IN functionality to the record query. Additionally,
+	 * multiple fields can be searched for the needed variables by separating the field names with "|" as in field1|field2|field3
 	 */
 	public function __construct($projects, $keyValues, $caseSensitive = true) {
 		if(get_class($projects) == "Plugin\\ProjectSet") {
@@ -161,6 +166,39 @@ class RecordSet {
 
 		return $newRecordSet;
 	}
+
+	/**
+	 * @param $project int|string|\Plugin\Project
+	 *
+	 * @return \Plugin\RecordSet
+	 */
+	public function filterByProject($project) {
+		$projectID = "";
+		if ($project == ""){
+			return "";
+		} else if (get_class($project) == "Plugin\\Project"){
+			$projectID = $project->getProjectId();
+		} else if (gettype($project) == "string"){
+			$projectObj = new \Plugin\Project($project);
+			$projectID = $projectObj->getProjectId();
+		} else if (is_numeric($project)){
+			$projectID = $project;
+		}
+
+		$newRecordSet = new self($this->projects,$this->keyValues);
+
+		foreach($this->getRecords() as $record){
+			if ($record->getProjectObject()->getProjectId() == $projectID){
+				$newRecordSet->addToRecordSet($record);
+			}
+		}
+
+		if(!$newRecordSet->records){
+			$newRecordSet->records = array();
+		}
+
+		return $newRecordSet;
+	}
 	
 	public function sortRecords($fieldName, $reverseSort = false) {
 		$recordDetails = $this->getDetails($fieldName);
@@ -236,17 +274,24 @@ class RecordSet {
 					$comparator = $keyComparatorPair[1];
 				}
 
+				$fieldNames = explode("|",$key);
+
 				$fromClause .= ($fromClause == "" ? "\nFROM " : ", ") . "redcap_data d" . $tableKey;
 				$whereClause .= ($whereClause == "" ? "\nWHERE " : "\nAND ") .
 					($tableKey == 1 ? "d$tableKey.project_id IN (" . implode(",",$this->projects->getProjectIds()) . ")\n" : "d$tableKey.project_id = d1.project_id\n") .
 					($tableKey == 1 ? "" : "AND d$tableKey.record = d1.record\n") .
-					($this->caseSensitive ? "AND d$tableKey.field_name = '$key'\n" : "AND LOWER(d$tableKey.field_name) = '".strtolower($key)."'\n").
-					"AND d$tableKey.value $comparator ".(is_array($value) ? "('".implode("','",$value)."')" : "'".$value."'");
+					"AND d$tableKey.field_name IN ('".implode("','",$fieldNames)."')\n".
+					"AND ".($this->caseSensitive ? "d$tableKey.value $comparator ".(is_array($value) ? "('".implode("','",$value)."')" : "'".$value."'") :
+						"LOWER(d$tableKey.value) $comparator ".strtolower(is_array($value) ? "('".implode("','",$value)."')" : "'".$value."'"));
 
 				$tableKey++;
 			}
 
 			$sql = $baseSql . $fromClause . $whereClause;
+
+			if(self::$debugSql) {
+				echo "RecordSet SQL: <br />\n$sql<br />";
+			}
 
 			if (!($result = db_query($sql))) throw new Exception("Failed to lookup record IDs $sql", self::SQL_ERROR);
 
