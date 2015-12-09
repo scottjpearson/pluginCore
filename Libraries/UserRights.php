@@ -39,6 +39,7 @@ class UserRights {
 	public $data_logging;
 	public $file_repository;
 	public $user_rights;
+    public $has_access;
 	public $design;
 	public $data_access_groups;
 	public $reports;
@@ -119,6 +120,8 @@ class UserRights {
 					WHERE u.project_id = " . $project->getProjectId() . "
 						AND u.username = '$username'";
 
+            //die( $sql );
+
 			$query = db_query($sql);
 			if(!$query) throw new \Exception("Error looking up user rights", self::$SQL_ERROR);
 
@@ -136,7 +139,10 @@ class UserRights {
 				$this->dag_name = $row["group_name"];
 				$this->role_id = $row["role_id"];
 				$this->group_id = $row["group_id"];
-			}
+                $this->has_access = 1;
+			} else {
+                $this->has_access = 0;
+            }
 		}
 	}
 
