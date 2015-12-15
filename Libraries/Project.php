@@ -21,6 +21,7 @@ class Project {
 	protected $fieldList;
 	protected $formList;
 	protected $recordList;
+	protected $projectDetails;
 
 	/**
 	 * @param $projectName string|integer
@@ -321,6 +322,20 @@ class Project {
 		}
 
 		return $this->recordList;
+	}
+
+	public function getProjectDetails() {
+		if(!isset($this->projectDetails)) {
+			$sql = "SELECT *
+					FROM redcap_projects
+					WHERE project_id = ".$this->getProjectId();
+
+			$q = db_query($sql);
+			if(!$q) echo "Error: ".db_error()."<br />\n".$sql."<br />\n";
+
+			$this->projectDetails = db_fetch_assoc($q);
+		}
+		return $this->projectDetails;
 	}
 
 	/*
