@@ -145,6 +145,7 @@ class Record {
 				$sql = "UPDATE redcap_data
 						SET value = '" . db_real_escape_string($value) . "'
 						WHERE project_id = {$this->project->getProjectId()}
+							AND event_id = {$this->project->getEventId()}
 							AND record = '{$this->id}'
 							AND field_name = '" . db_real_escape_string($fieldName) . "'";
 
@@ -294,11 +295,12 @@ class Record {
 			$sql = "SELECT d.field_name, d.value
 					FROM redcap_data d
 					WHERE d.project_id = ".$this->project->getProjectId()."
+						AND d.event_id = ".$this->project->getEventId()."
 						AND d.record = '{$this->id}'";
 
 			if(!($result = db_query($sql))) throw new Exception("Failed to lookup instrument details");
 
-			if(db_num_rows($result) == 0) throw new Exception("Instrument data missing ".$sql);
+			//if(db_num_rows($result) == 0) throw new Exception("Instrument data missing ".$sql);
 
 			$this->details = array();
 

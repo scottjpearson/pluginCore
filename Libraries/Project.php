@@ -25,13 +25,14 @@ class Project {
 
 	/**
 	 * @param $projectName string|integer
+	 * @param $eventId integer
 	 */
-	public function __construct($projectName) {
+	public function __construct($projectName,$eventId = "") {
 		## Can't be a short code, so must be a project ID
 		if(is_numeric($projectName)) {
 			$this->projectName = "";
 			$this->projectId = $projectName;
-			$this->eventId = self::getEventFromId($projectName);
+			$this->eventId = $eventId == "" ? self::getEventFromId($projectName) : $eventId;
 		}
 		else {
 			$this->projectName = $projectName;
@@ -39,7 +40,7 @@ class Project {
 		$this->metadata = new MetadataCollection();
 
 		if($projectName != "") {
-			$this->initializeProjectIds();
+			$this->initializeProjectIds($eventId);
 		}
 		else {
 			$this->projectId = "";
@@ -177,9 +178,13 @@ class Project {
 	}
 
 	# Look up this project's project ID if that hasn't been done already
-	private final function initializeProjectIds() {
+	private final function initializeProjectIds($eventId = "") {
 		if(!isset($this->projectId) && $this->projectName != "") {
 			list($this->projectId, $this->eventId) = self::getProjectAndEvent($this->projectName);
+
+			if($eventId != "") {
+				$this->eventId = $eventId;
+			}
 		}
 	}
 
