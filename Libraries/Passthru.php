@@ -16,35 +16,17 @@ class Passthru {
 	 * @param bool $dontCreateForm
 	 * @return string
 	 */
-	public static function passthruToSurvey(\Plugin\Record $record, $surveyFormName = "", $dontCreateForm = false) {
-		// Get survey_id, form status field, and save and return setting
-		$sql = "SELECT s.survey_id, s.form_name, s.save_and_return
-		 		FROM redcap_projects p, redcap_surveys s, redcap_metadata m
-					WHERE p.project_id = ".$record->getProjectObject()->getProjectId()."
-						AND p.project_id = s.project_id
-						AND m.project_id = p.project_id
-						AND s.form_name = m.form_name
-						".($surveyFormName != "" ? "AND s.form_name = '$surveyFormName'" : "")
-					." LIMIT 1";
+	public static function passthruToSurvey($record, $surveyFormName = "", $dontCreateForm = false) {
+		// Get survey_id, form status field
+		list($surveyFormName, $surveyId) = self::getSurveyFormAndId($record, $surveyFormName);
 
-		$q = db_query($sql);
-		$surveyFormName = db_result($q, 0, 'form_name');
-		$surveyId = db_result($q, 0, 'survey_id');
-		$surveyAlreadyStarted = false;
-		
-		// Set the response as incomplete in the data table
-		$sql = "UPDATE redcap_data
-				SET value = '0'
-				WHERE project_id = ".$record->getProjectObject()->getProjectId()."
-					AND record = '".$record->getId()."'
-					AND event_id = ".$record->getProjectObject()->getEventId()."
-					AND field_name = '{$surveyFormName}_complete'";
-
-		$q = db_query($sql);
-		// Log the event (if value changed)
-		if ($q && db_affected_rows() > 0) {
-			$surveyAlreadyStarted = true;
-			log_event($sql,"redcap_data","UPDATE",$record,"{$surveyFormName}_complete = '0'","Update record");
+		if($surveyId == "") {
+			if($dontCreateForm) {
+				return false;
+			}
+			else {
+				die("Error: Survey ID not found<br />{$record->getId()} : $surveyFormName<br />");
+			}
 		}
 
 		# Check if a participant and response exists for this survey/record combo
@@ -78,12 +60,12 @@ class Passthru {
 			$sql = "INSERT INTO redcap_surveys_participants (survey_id, event_id, participant_email, participant_identifier, hash)
 					VALUES ($surveyId, ".$record->getProjectObject()->getEventId().", '', null, '$hash')";
 			
-			if(!db_query($sql)) echo "Error: ".db_error()." <br />";
+			if(!db_query($sql)) echo "Error: ".db_error()." <br />$sql<br />";
 			$participantId = db_insert_id();
 
 			# Since response_id does NOT exist yet, create it.
 			if(!$dontCreateForm) {
-				$returnCode = "'".generateRandomHash()."'";
+				$returnCode = generateRandomHash();
 				$firstSubmitDate = "'".date('Y-m-d h:m:s')."'";
 			}
 			else {
@@ -92,9 +74,9 @@ class Passthru {
 			}
 			
 			$sql = "INSERT INTO redcap_surveys_response (participant_id, record, first_submit_time, return_code)
-					VALUES ($participantId, ".$record->getId().", $firstSubmitDate,$returnCode)";
+					VALUES ($participantId, ".$record->getId().", $firstSubmitDate,'$returnCode')";
 			
-			if(!db_query($sql)) echo "Error: ".db_error()." <br />";
+			if(!db_query($sql)) echo "Error: ".db_error()." <br />$sql<br />";
 		}
 		# Find the existing participant and response for this record
 		else {
@@ -106,20 +88,12 @@ class Passthru {
 					AND r.record = '".$record->getId()."'";
 			
 			$queryResults = db_fetch_assoc(db_query($sql));
-
 			$returnCode = $queryResults['return_code'];
 			$hash = $queryResults['hash'];
 		}
 
 		if(!$dontCreateForm) {
-			// Set the response as incomplete in the response table
-			$sql = "UPDATE redcap_surveys_participants p, redcap_surveys_response r
-					SET r.completion_time = null
-					WHERE p.survey_id = $surveyId
-						AND p.event_id = ".$record->getProjectObject()->getEventId()."
-						AND r.participant_id = p.participant_id
-						AND r.record = '".$record->getId()."' ";
-			db_query($sql);
+			self::resetSurvey($record, $surveyFormName);
 		}
 
 		$surveyLink = APP_PATH_SURVEY_FULL . "?s=$hash";
@@ -135,7 +109,7 @@ class Passthru {
 			## Build invisible self-submitting HTML form to get the user to the survey
 			echo "<html><body>
 				<form name='passthruform' action='$surveyLink' method='post' enctype='multipart/form-data'>
-				".($returnCode == "NULL" ? "" : "<input type='hidden' value='$returnCode' name='__code'/>")."
+				".($returnCode == "NULL" ? "" : "<input type='hidden' value='".$returnCode."' name='__code'/>")."
 				<input type='hidden' value='1' name='__prefill' />
 				</form>
 				<script type='text/javascript'>
@@ -145,5 +119,50 @@ class Passthru {
 				</html>";
 			return false;
 		}
+	}
+
+	public static function resetSurvey($record, $surveyFormName = "") {
+		list($surveyFormName, $surveyId) = self::getSurveyFormAndId($record, $surveyFormName);
+
+		// Set the response as incomplete in the data table
+		$sql = "UPDATE redcap_data
+				SET value = '0'
+				WHERE project_id = ".$record->getProjectObject()->getProjectId()."
+					AND record = '".$record->getId()."'
+					AND event_id = ".$record->getProjectObject()->getEventId()."
+					AND field_name = '{$surveyFormName}_complete'";
+
+		$q = db_query($sql);
+		// Log the event (if value changed)
+		if ($q && db_affected_rows() > 0) {
+			log_event($sql,"redcap_data","UPDATE",$record,"{$surveyFormName}_complete = '0'","Update record");
+		}
+
+		// Set the response as incomplete in the response table
+		$sql = "UPDATE redcap_surveys_participants p, redcap_surveys_response r
+					SET r.completion_time = null, r.first_submit_time = null
+					WHERE p.survey_id = $surveyId
+						AND p.event_id = ".$record->getProjectObject()->getEventId()."
+						AND r.participant_id = p.participant_id
+						AND r.record = '".$record->getId()."' ";
+		db_query($sql);
+	}
+
+	public static function getSurveyFormAndId($record, $formName = "") {
+		// Get survey_id, form status field, and save and return setting
+		$sql = "SELECT s.survey_id, s.form_name, s.save_and_return
+		 		FROM redcap_projects p, redcap_surveys s, redcap_metadata m
+					WHERE p.project_id = ".$record->getProjectObject()->getProjectId()."
+						AND p.project_id = s.project_id
+						AND m.project_id = p.project_id
+						AND s.form_name = m.form_name
+						".($formName != "" ? "AND s.form_name = '$formName'" : "")
+				." LIMIT 1";
+
+		$q = db_query($sql);
+		$formName = db_result($q, 0, 'form_name');
+		$surveyId = db_result($q, 0, 'survey_id');
+
+		return array($formName, $surveyId);
 	}
 } 
