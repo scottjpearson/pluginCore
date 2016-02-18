@@ -26,14 +26,14 @@ class PDF extends \FPDF{
 		parent::FPDF();
 	}
 
-	public function printPdf() {
+	public function printPdf($title = "TestDownload") {
 		if(!is_a($this->project,"\\Plugin\\Project") || !is_a($this->record, "\\Plugin\\Record") || $this->formName == "") {
 			echo "Invalid parameters";
 			return;
 		}
 
 		header("Content-type: application/octet-stream");
-		header("Content-Disposition: attachment; filename='TestDownload.pdf'");
+		header("Content-Disposition: attachment; filename='$title.pdf'");
 
 		//Set the character limit per line for questions (left column) and answers (right column)
 		$char_limit_q = 54; //question char limit per line
