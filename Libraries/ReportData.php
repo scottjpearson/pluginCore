@@ -19,14 +19,20 @@ class ReportData {
 	const GROUP_ID = "selectedGroup";
 	const DENOMINATOR_FIELD = "denominator";
 	const DATA_GROUPING = "dataGrouping";
-	const DATA_ROW = "dataToDisplay";
 	const TYPE_OF_DATA = "dataSummaryType";
 	const LEVEL_OF_DATA = "dataDepth";
 	const DATE_RANGE = "dateRange";
 	const DATE_FIELD = "dateField";
 
-	const SELF_GET = "self";
+	const SELF_GET = "Self";
 	const TIERED_DEMOGRAPHIC_TAG = "GROUP";
+
+	const AVERAGE = "average";
+	const TOTAL = "total";
+	const COUNT = "count";
+
+	const IN_GROUP_GROUPED = "in_group";
+	const IN_GROUP_ALL = "in_group_all";
 
 	/**
 	 * @param $project \Plugin\Project
