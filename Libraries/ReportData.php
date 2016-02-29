@@ -14,15 +14,15 @@ class ReportData {
 	private $project;
 	private $jsonData;
 
-	const COMPARE_BY = "compareBy";
-	const IDENTIFIER_FIELD = "identifier";
-	const GROUP_ID = "selectedGroup";
-	const DENOMINATOR_FIELD = "denominator";
-	const DATA_GROUPING = "dataGrouping";
-	const TYPE_OF_DATA = "dataSummaryType";
-	const LEVEL_OF_DATA = "dataDepth";
-	const DATE_RANGE = "dateRange";
-	const DATE_FIELD = "dateField";
+	const COMPARE_BY_FIELD = "compareBy"; // Field to be used to group sites
+	const SITE_IDENTIFIER_FIELD = "identifier"; // Field to be used to identify site requesting data
+	const SITE_IDENTIFIER_VALUE = "selectedGroup"; // Field value of site requesting data
+	const DENOMINATOR_FIELD = "denominator"; // Field used to divide the value for each site
+	const DATA_FIELDS_REQUESTED = "dataGrouping"; // List of fields being reported on, comma-separated
+	const TYPE_OF_DATA = "dataSummaryType"; // AVERAGE, TOTAL, COUNT, etc
+	const LEVEL_OF_DATA = "dataDepth"; // SITE_LEVEL_DATA, GROUP_LEVEL_DATA, GLOBAL_LEVEL_DATA, etc
+	const DATE_RANGE = "dateRange"; //
+	const DATE_FIELD = "dateField"; //
 
 	const SELF_GET = "Self";
 	const TIERED_DEMOGRAPHIC_TAG = "GROUP";
@@ -31,8 +31,9 @@ class ReportData {
 	const TOTAL = "total";
 	const COUNT = "count";
 
-	const IN_GROUP_GROUPED = "in_group";
-	const IN_GROUP_ALL = "in_group_all";
+	const SITE_LEVEL_DATA = "in_group"; /** One site's data plus average of that group as grouped by COMPARE_BY  */
+	const GROUP_LEVEL_DATA = "in_group_all"; /** All sites' data within the group  as grouped COMPARE_BY */
+	const GLOBAL_LEVEL_DATA = "by_group"; /** Summary of site data as grouped by COMPARE_BY */
 
 	/**
 	 * @param $project \Plugin\Project
@@ -44,6 +45,7 @@ class ReportData {
 	}
 
 	public function getReportData() {
+
 		$compareField = $this->jsonData[self::COMPARE_BY];
 		$denominatorField = $this->jsonData[self::DENOMINATOR_FIELD];
 		$dataToDisplay = $this->jsonData[self::DATA_GROUPING];

@@ -12,6 +12,7 @@ class RecordSet {
 	# Error codes
 	const SQL_ERROR = 1;
 	const INVALID_PROJECT = 2;
+	const MISSING_IDS_ERROR = 3;
 	const KEY_COMPARATOR_SEPARATOR = "~";
 
 	public $caseSensitive;
