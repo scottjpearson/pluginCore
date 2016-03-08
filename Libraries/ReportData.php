@@ -23,6 +23,7 @@ class ReportData {
 	const LEVEL_OF_DATA = "dataDepth"; // SITE_LEVEL_DATA, GROUP_LEVEL_DATA, GLOBAL_LEVEL_DATA, etc
 	const DATE_RANGE = "dateRange"; //
 	const DATE_FIELD = "dateField"; //
+    const DATE_GROUPING_TYPE = "dateGroupingType"; // BY_YEAR, BY_MONTH, EXACT_DATES, etc
 
 	const SELF_GET = "Self";
 	const TIERED_DEMOGRAPHIC_TAG = "GROUP";
@@ -35,6 +36,10 @@ class ReportData {
 	const GROUP_LEVEL_DATA = "in_group_all"; /** All sites' data within the group  as grouped COMPARE_BY */
 	const GLOBAL_LEVEL_DATA = "by_group"; /** Summary of site data as grouped by COMPARE_BY */
 
+    const BY_YEAR = "by_year";
+    const BY_MONTH = "by_month";
+    const EXACT_DATES = "exact_dates";
+
 	/**
 	 * @param $project \Plugin\Project
 	 * @param $jsonRequest string
@@ -46,101 +51,164 @@ class ReportData {
 
 	public function getReportData() {
 
-		$compareField = $this->jsonData[self::COMPARE_BY];
+		$compareField = $this->jsonData[self::COMPARE_BY_FIELD];
 		$denominatorField = $this->jsonData[self::DENOMINATOR_FIELD];
-		$dataToDisplay = $this->jsonData[self::DATA_GROUPING];
-		$specificField = $this->jsonData[self::DATA_ROW];
+		$dataToDisplay = $this->jsonData[self::DATA_FIELDS_REQUESTED];
+        $dateField = $this->jsonData[self::DATE_FIELD];
 		$typeOfData = isset($this->jsonData[self::TYPE_OF_DATA]) ? $this->jsonData[self::TYPE_OF_DATA] : "average";
-		$levelOfData = isset($this->jsonData[self::LEVEL_OF_DATA]) ? $this->jsonData[self::LEVEL_OF_DATA] : "byGroup";
+		$levelOfData = isset($this->jsonData[self::LEVEL_OF_DATA]) ? $this->jsonData[self::LEVEL_OF_DATA] : "by_group";
+        $dateGrouping = isset($this->jsonData[self::DATE_GROUPING_TYPE]) ? $this->jsonData[self::DATE_GROUPING_TYPE] : "by_year";
+        $dateRange = $this->jsonData[self::DATE_RANGE];
 
 		## If no data is requested, then assume the groupings is all that's wanted
-		if($specificField == "") {
-			$reportFields = array_flip(explode(",",$dataToDisplay));
-		}
-		else {
-			$reportFields = [$specificField => 1];
-		}
+        $reportFields = array_flip(explode(",",$dataToDisplay));
+
 
 		## Find the identifier in the JSON data
-		$identifier = $this->jsonData[self::GROUP_ID];
+		$identifier = $this->jsonData[self::SITE_IDENTIFIER_VALUE];
 
 		if($identifier == "") {
 			die("Please select a group to view the report");
 		}
 
-		## TODO Pass __GROUPID__ in for identifier for test query
-		$deptRecords = new RecordSet($this->project, [$this->jsonData[self::IDENTIFIER_FIELD] => $identifier]);
+		$deptRecords = new RecordSet($this->project, [$this->jsonData[self::SITE_IDENTIFIER_FIELD] => $identifier]);
 
 		if(count($deptRecords->getRecordIds()) == 0) die("Invalid DAG");
 
-		var_dump($deptRecords->getRecordIds());
+//		var_dump($deptRecords->getRecordIds());
 
-		echo "\n\n";
+//		echo "\n\n";
+        $dateValues = array();
+        $dates = array();
+        if ($dateRange != ""){
+            $dateArray = array();
+            foreach($deptRecords->getRecords() as $record){
+                $filteredDate = "";
+                if ($record->getDetails($dateField) == "") {
+                    continue;
+                }
 
-		$dateValues = array_unique($deptRecords->getDetails(self::DATE_FIELD));
-		sort($dateValues);
+                if($dateGrouping == 'by_month'){
+                    $explodedDate = explode("-", $record->getDetails($dateField));
+
+                    $filteredDate = $explodedDate[1]."-".$explodedDate[0];
+                }
+                else if ($dateGrouping == 'exact_dates'){
+                    $filteredDate = $record->getDetails($dateField);
+                }
+                else {
+                    $explodedDate = explode("-", $record->getDetails($dateField));
+                    $filteredDate = $explodedDate[0];
+                }
+                $dateArray[] = $filteredDate;
+            }
+
+
+            if($dateGrouping == 'by_month'){
+                $convertedDate = strtotime($dateRange);
+                $start = date('Y-m-d', strtotime(date('Y',$convertedDate)."-".date("m",$convertedDate)."-01"));
+                $end = date('Y-m-d', strtotime(date('Y',$convertedDate)."-".(date("m",$convertedDate)+1)."-00"));
+                $dates = array('start' => $start, 'end' => $end);
+            }
+            else if ($dateGrouping == 'exact_dates'){
+                $start = $dateRange;
+                $end = $dateRange;
+                $dates = array('start' => $start, 'end' => $end);
+            }
+            else {
+                $convertedDate = strtotime($dateRange);
+                $start = strtotime("1/1/".date("Y",$convertedDate));
+                $end = strtotime("12/31/".date("Y",$convertedDate));
+                $dates = array('start' => $start, 'end' => $end);
+            }
+
+
+
+            $dateValues = array_unique($dateArray);
+            sort($dateValues);
+
+        } else if (is_array($dateRange)){
+            ## filter between 2 dates
+            $dateValues = array_unique($dateArray);
+            sort($dateValues);
+        } else {
+            $dateValues = array_unique($deptRecords->getDetails($dateField));
+            sort($dateValues);
+        }
+
+//        var_dump($dateValues);
 
 		$filterArray = [];
 
-		if($year != "") {
-			$dateValues = [$year];
+//		if($year != "") {
+//			$dateValues = [$year];
+//
+//			$filterArray[self::DATE_FIELD] = $year;
+//
+//			$deptRecords = $deptRecords->filterRecords([self::DATE_FIELD => $year]);
+//
+//			$recordsByDate = [$year => new RecordSet($this->project, $filterArray)];
+//		}
+//        else if ($month != ""){
+//
+//        }
+//		else {
+        $recordsByDate = [];
 
-			$filterArray[self::DATE_FIELD] = $year;
+        foreach($dateValues as $date) {
+            $finalFilter = $filterArray;
+            if ($dateGrouping == 'exact_dates'){
+                $finalFilter[$dateField] = $date;
+            }
+            else {
+                $finalFilter = array(\Plugin\RecordSet::getKeyComparatorPair($dateField, 'LIKE') => '%' . $date . '%');
+            }
+//            var_dump($finalFilter);
 
-			$deptRecords = $deptRecords->filterRecords([self::DATE_FIELD => $year]);
+            ## Add filter to only include records in the same $compareField as the user's dept
+            if($levelOfData == "inGroup") {
+                $thisYearsRecord = reset($deptRecords->filterRecords([\Plugin\RecordSet::getKeyComparatorPair($dateField ,'>=') => $dates['start'], \Plugin\RecordSet::getKeyComparatorPair($dateField ,'<=') => $dates['end']])->getRecords());
 
-			$recordsByDate = [$year => new RecordSet($this->project, $filterArray)];
-		}
-		else {
-			$recordsByDate = [];
+                if($this->tierGroupings == "") {
+                    $finalFilter[$compareField] = $thisYearsRecord->getDetails($compareField);
+                }
+                else {
+                    foreach($this->tierGroupings as $groupKey => $maxThreshold) {
+                        if($groupKey == (count($this->tierGroupings) - 1)) {
+                            $finalFilter[RecordSet::getKeyComparatorPair($compareField, ">=")] = $maxThreshold;
+                            break;
+                        }
+                        if($thisYearsRecord->getDetails($compareField) < $this->tierGroupings[$groupKey + 1]) {
+                            $finalFilter[RecordSet::getKeyComparatorPair($compareField, ">=")] = $maxThreshold;
+                            $finalFilter[RecordSet::getKeyComparatorPair($compareField, "<")] = $this->tierGroupings[$groupKey + 1];
+                            break;
+                        }
+                    }
+                }
+            }
 
-			foreach($dateValues as $year) {
-				$finalFilter = $filterArray;
-				$finalFilter[self::DATE_FIELD] = $year;
-
-				## Add filter to only include records in the same $compareField as the user's dept
-				if($levelOfData == "inGroup") {
-					$thisYearsRecord = reset($deptRecords->filterRecords([self::DATE_FIELD => $year])->getRecords());
-
-					if($this->tierGroupings == "") {
-						$finalFilter[$compareField] = $thisYearsRecord->getDetails($compareField);
-					}
-					else {
-						foreach($this->tierGroupings as $groupKey => $maxThreshold) {
-							if($groupKey == (count($this->tierGroupings) - 1)) {
-								$finalFilter[RecordSet::getKeyComparatorPair($compareField, ">=")] = $maxThreshold;
-								break;
-							}
-							if($thisYearsRecord->getDetails($compareField) < $this->tierGroupings[$groupKey + 1]) {
-								$finalFilter[RecordSet::getKeyComparatorPair($compareField, ">=")] = $maxThreshold;
-								$finalFilter[RecordSet::getKeyComparatorPair($compareField, "<")] = $this->tierGroupings[$groupKey + 1];
-								break;
-							}
-						}
-					}
-				}
-
-				var_dump($finalFilter);echo "\n\n";
-				$recordsByDate[$year] = new RecordSet($this->project, $finalFilter);
-				$recordsByDate[$year]->getDetails();
-			}
-		}
+            //var_dump($finalFilter);echo "\n\n";
+            $recordsByDate[$date] = new RecordSet($this->project, $finalFilter);
+            $recordsByDate[$date]->getDetails();
+//            var_dump($recordsByDate);
+        }
+//		}
 
 		## Currently have $deptRecords with all the user's department's information that is relevant to this search
 		## Also have $recordsByDate for every valid date for the query
 		$annualSummaries = [];
 		//echo "Report Fields: \n";
 		//var_dump($reportFields);echo "\n\n";
-		//var_dump($recordsByDate[$year]->getRecordIds());echo "\n\n";
+		//var_dump($recordsByDate);echo "\n\n";
 
-		if($levelOfData == "byGroup") {
+		if($levelOfData == "by_group") {
 			## Need to summarize data for each group (using $typeOfData)
-			foreach($dateValues as $year) {
+			foreach($dateValues as $date) {
 				/** @var RecordSet $yearlyData */
-				$yearlyData = $recordsByDate[$year];
+				$yearlyData = $recordsByDate[$date];
 
-				echo "Year: $year\n\n";
-				var_dump($yearlyData->getRecordIds());echo "\n\n";
+//				echo "Year: $year\n\n";
+//				var_dump($yearlyData->getRecordIds());echo "\n\n";
 
 				if($this->tierGroupings == "") {
 					$groupList = array_unique($yearlyData->getDetails($compareField, false));
@@ -173,10 +241,10 @@ class ReportData {
 					}
 
 					foreach($reportFields as $field => $number) {
-						$annualSummaries[$year][$groupName][$field] = [];
+						$annualSummaries[$date][$groupName][$field] = [];
 
 						foreach($groupData->getRecords() as $newRecord) {
-							$annualSummaries[$year][$groupName][$field][] = $newRecord->getDetails($field);
+							$annualSummaries[$date][$groupName][$field][] = $newRecord->getDetails($field);
 						}
 					}
 				}
@@ -184,30 +252,30 @@ class ReportData {
 		}
 		else if($levelOfData == "inGroup") {
 			## TODO: Do we display a summary of the non-user hospitals or each of the non-user hospitals?
-			foreach($dateValues as $year) {
-				$thisYearsRecord = reset($deptRecords->filterRecords([self::DATE_FIELD => $year])->getRecords());
+			foreach($dateValues as $date) {
+				$thisYearsRecord = reset($deptRecords->filterRecords([$dateField => $date])->getRecords());
 
 				foreach($reportFields as $field => $number) {
-					$annualSummaries[$year][self::SELF_GET][$field] = $thisYearsRecord->getDetails($field);
+					$annualSummaries[$date][self::SELF_GET][$field] = $thisYearsRecord->getDetails($field);
 				}
 
 				foreach($reportFields as $field => $number) {
-					$annualSummaries[$year]["Similar EDs"][$field] = [];
+					$annualSummaries[$date]["Similar EDs"][$field] = [];
 				}
 
 				foreach($reportFields as $field => $number) {
-					foreach($recordsByDate[$year]->getRecords() as $newRecord) {
+					foreach($recordsByDate[$date]->getRecords() as $newRecord) {
 						if($newRecord->getId() == $thisYearsRecord->getId()) { continue; }
 
-						$annualSummaries[$year]["Similar EDs"][$field][] = $newRecord->getDetails($field);
+						$annualSummaries[$date]["Similar EDs"][$field][] = $newRecord->getDetails($field);
 					}
 				}
 			}
 		}
 
-		var_dump($annualSummaries);echo "<br /><br />\n\n";
+//		var_dump($annualSummaries);echo "<br /><br />\n\n";
 
-		# Go through the data and make the summary information
+		# Go through the data and make the summary information TODO: count and total data
 		foreach($annualSummaries as $year => $yearData) {
 			foreach($yearData as $groupName => $groupData) {
 				if($groupName == self::SELF_GET) continue;
@@ -227,6 +295,12 @@ class ReportData {
 					else if ($typeOfData == "average") {
 						$annualSummaries[$year][$groupName][$field] = array_sum($fieldData) / count($fieldData);
 					}
+                    else if ($typeOfData == "total") {
+                        $annualSummaries[$year][$groupName][$field] = array_sum($fieldData);
+                    }
+                    else if ($typeOfData == "count") {
+                        $annualSummaries[$year][$groupName][$field] = count($fieldData);
+                    }
 				}
 			}
 		}
