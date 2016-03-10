@@ -123,7 +123,7 @@ class UserRights {
             //die( $sql );
 
 			$query = db_query($sql);
-			if(!$query) throw new \Exception("Error looking up user rights", self::$SQL_ERROR);
+			if(!$query) throw new \Exception("Error looking up user rights ".db_error(), self::$SQL_ERROR);
 
 			if($row = db_fetch_assoc($query)) {
 				## Import all variables that are set by role

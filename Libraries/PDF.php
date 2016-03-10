@@ -11,6 +11,8 @@ class PDF extends \FPDF{
 	public $project;
 	public $record;
 	public $formName;
+	private $callbackName;
+	private $callbackClass;
 
 	public $font = "Arial";
 
@@ -31,12 +33,17 @@ class PDF extends \FPDF{
 	 * @param $record \Plugin\Record
 	 * @param $formName string
 	 */
-	function __construct($project, $record, $formName) {
+	public function __construct($project, $record, $formName) {
 		$this->project = $project;
 		$this->record = $record;
 		$this->formName = $formName;
 
 		parent::FPDF();
+	}
+
+	public function setFieldCallbackFunction($functionName, $className = "") {
+		$this->callbackName = $functionName;
+		$this->callbackClass = $className;
 	}
 
 	public function printPdf($title = "TestDownload") {
@@ -107,6 +114,16 @@ class PDF extends \FPDF{
 		$value = $this->record->getDetails($metadata->getFieldName());
 		$enum = $metadata->getElementEnum();
 
+			$value = $this->record->getDetails($metadata->getFieldName());
+
+			## Use callback function to update the value
+			if($this->callbackName != "") {
+				if($this->callbackClass != "") {
+					$value = (($this->callbackClass)::$this->callbackName($value));
+				}
+			}
+
+			$enum = $metadata->getElementEnum();
 		## Convert enum fields and yesno fields
 		if ($enum != "") {
 			$value = Project::renderEnumData($value, $enum);
@@ -114,6 +131,8 @@ class PDF extends \FPDF{
 			$value = self::$enumTypes[$metadata->getElementType()][$value];
 		}
 
+			if($enum != "") {
+				$value = Project::renderEnumData($value, $enum);
 		## Replace blank data with an underscored line
 		$value = $value ? $value : "__________________________________";
 

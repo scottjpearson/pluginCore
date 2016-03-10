@@ -50,7 +50,6 @@ class ReportData {
 	}
 
 	public function getReportData() {
-
 		$compareField = $this->jsonData[self::COMPARE_BY_FIELD];
 		$denominatorField = $this->jsonData[self::DENOMINATOR_FIELD];
 		$dataToDisplay = $this->jsonData[self::DATA_FIELDS_REQUESTED];
@@ -62,22 +61,94 @@ class ReportData {
 
 		## If no data is requested, then assume the groupings is all that's wanted
         $reportFields = array_flip(explode(",",$dataToDisplay));
-
+		if(count($reportFields) == 0) {
+			$reportFields = array($compareField => "0");
+		}
 
 		## Find the identifier in the JSON data
 		$identifier = $this->jsonData[self::SITE_IDENTIFIER_VALUE];
+		$identifierField = $this->jsonData[self::SITE_IDENTIFIER_FIELD];
 
 		if($identifier == "") {
 			die("Please select a group to view the report");
 		}
 
-		$deptRecords = new RecordSet($this->project, [$this->jsonData[self::SITE_IDENTIFIER_FIELD] => $identifier]);
+		# Get and format start and end dates based on $dateGrouping and $dateRange
+		$startDate = $dateRange;
+		$endDate = $dateRange;
 
-		if(count($deptRecords->getRecordIds()) == 0) die("Invalid DAG");
+		if($dateRange == "") {
+			$startDate = 0;
+			$endDate = strtotime(date("2050-01-01"));
+		}
+		else if(count($dateRange) > 1) {
+			$startDate = strtotime($dateRange[0]);
+			$endDate = strtotime($dateRange[1]);
+		}
 
-//		var_dump($deptRecords->getRecordIds());
+		if($dateGrouping == self::BY_MONTH || $dateGrouping == self::BY_YEAR) {
+			$startDate = is_numeric($startDate) ? $startDate : strtotime($startDate);
+			$endDate = is_numeric($startDate) ? $startDate : strtotime($endDate);
+		}
 
-//		echo "\n\n";
+		if($dateGrouping == self::BY_MONTH) {
+			$startDate = strtotime(date("Y-m-",$startDate)."1");
+			$endDate = strtotime(date("Y-",$startDate).(date("m",$startDate) + 1)."-0");
+		}
+		else if($dateGrouping == self::BY_YEAR) {
+			$startDate = strtotime(date("Y-",$startDate)."01-01");
+			$endDate = strtotime((date("Y",$startDate) + 1)."-01-00");
+		}
+
+		# Find list of records that fit in the start and end dates
+		$recordsInDateRange = array();
+		if($dateField == "") {
+			# This means we're going to use the "INSERT" log for each record to determine date range
+			$sql = "SELECT d.pk, d.max_ts
+					FROM (SELECT l.pk, MAX(l.ts) as max_ts
+						FROM redcap_log_event l
+						WHERE l.project_id = ".$this->project->getProjectId()."
+							AND l.ts >= ".date("Ymd", $startDate)."000000
+							AND l.event = 'INSERT'
+							AND l.object_type = 'redcap_data'
+						GROUP BY l.pk) AS d
+					WHERE d.max_ts >= ".date("Ymd", $startDate)."000000
+						AND d.max_ts < ".date("Ymd", $endDate)."999999";
+
+			$q = db_query($sql);
+			while($row = db_fetch_assoc($q)) {
+				$recordsInDateRange[] = $row["pk"];
+			}
+		}
+		else {
+			$inRangeRecordSet = new RecordSet($this->project, [RecordSet::getKeyComparatorPair($dateField,">=") => $startDate,
+					RecordSet::getKeyComparatorPair($dateField,"<=") => $endDate]);
+
+			$recordsInDateRange = $inRangeRecordSet->getRecordIds();
+		}
+
+		$deptRecords = new RecordSet($this->project, [$identifierField => $identifier, RecordSet::getKeyComparatorPair($this->project->getFirstFieldName(),"IN") => $recordsInDateRange]);
+
+		# If found no records, return a blank json string
+		if(count($deptRecords->getRecordIds()) == 0) {
+			$returnValues = array("" => array());
+			foreach($reportFields as $fieldName => $fieldKey) {
+				$returnValues[""][] = array($fieldName => 0);
+			}
+			return json_encode($returnValues);
+		}
+
+		# Pull the relevant data for other groups, either within the compare by group of the site or for all groups with records in the date range
+## TODO, start back here
+		$allRecords = new RecordSet($this->project, [RecordSet::getKeyComparatorPair($dateField,">=") => $startDate,
+			 	RecordSet::getKeyComparatorPair($dateField,"<=") => $endDate,
+				])
+
+		# Group the data together by year and output category(compare by group) while dividing by denominator
+
+
+		# Summarize the date by year and output category
+
         $dateValues = array();
         $dates = array();
         if ($dateRange != ""){
