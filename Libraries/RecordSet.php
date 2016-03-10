@@ -113,6 +113,7 @@ class RecordSet {
 			foreach ($keyValues as $key => $value) {
 				$keyComparatorPair = explode(self::KEY_COMPARATOR_SEPARATOR, $key);
 				$key = $keyComparatorPair[0];
+				$comparator = strtolower($keyComparatorPair[1]);
 
 				$recordValue = $potentialRecord->getDetails($key);
 
@@ -126,7 +127,7 @@ class RecordSet {
 					$value = strtolower($value);
 				}
 
-				switch($keyComparatorPair[1]) {
+				switch($comparator) {
 					case ">":
 						$thisKeyMatches = ($recordValue > $value);
 						break;
@@ -144,6 +145,9 @@ class RecordSet {
 						break;
 					case "like":
 						$thisKeyMatches = (strpos($recordValue,$value) === false ? 0 : 1);
+						break;
+					case "in":
+						$thisKeyMatches = in_array($recordValue,$value);
 						break;
 					default:
 						$thisKeyMatches = ($recordValue == $value);

@@ -19,6 +19,7 @@ class Record {
 	protected $id;
 	protected $details;
 	protected $keyValues;
+	protected $creationTs;
 
 	private $keys;
 
@@ -210,6 +211,23 @@ class Record {
 
 	public function checkCurrentRole() {
 		return $this->getUserRights()->role_name;
+	}
+
+	public function getRecordCreationTs() {
+		if(!isset($this->creationTs)) {
+			$sql = "SELECT l.ts
+					FROM redcap_log_event l
+					WHERE l.project_id = ".$this->getProjectObject()->getProjectId()."
+						AND l.pk = '".$this->getId()."'
+						AND l.event = 'INSERT'
+						AND l.object_type = 'redcap_data'
+					ORDER BY l.ts DESC
+					LIMIT 1";
+
+			$this->creationTs = db_result(db_query($sql),0);
+		}
+
+		return $this->creationTs;
 	}
 
 	# Loops through the 2-dimensional $keys array to determine if $this->keyValues is a valid key for this project
