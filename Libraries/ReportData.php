@@ -131,7 +131,6 @@ class ReportData {
 		$allRecords = new RecordSet($this->project, [RecordSet::getKeyComparatorPair($this->project->getFirstFieldName(), "IN") => $allRecordsInDateRange]);
 
 		## For in group comparisons, filter out records outside of the group
-		## TODO Need to correct this if the COMPARE_BY_FIELD is also a tiered field
 		if(in_array($this->jsonData[self::LEVEL_OF_DATA], array(self::SITE_LEVEL_DATA, self::GROUP_LEVEL_DATA))) {
 			# Get converted value if if exists and parse the string to find the range to filter within
 			if(isset($this->tierGroupings[$this->jsonData[self::COMPARE_BY_FIELD]])) {
@@ -205,7 +204,7 @@ class ReportData {
 		var_dump($recordsByDate);
 die("");
 		# Summarize the date by year and output category
-
+##TODO Continue Here
 
 		## Currently have $deptRecords with all the user's department's information that is relevant to this search
 		## Also have $recordsByDate for every valid date for the query
