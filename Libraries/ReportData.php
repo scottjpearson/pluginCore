@@ -191,133 +191,45 @@ class ReportData {
 				$convertedValue = $this->getConvertedValue($record, $this->jsonData[self::COMPARE_BY_FIELD]);
 
 				if(!isset($recordsByDate[$reportDate][$convertedValue])) {
-					foreach($reportFields as $thisField) {
+					foreach($reportFields as $thisField => $fieldKey) {
 						$recordsByDate[$reportDate][$convertedValue][$thisField] = [];
 					}
 				}
 
-				foreach($reportFields as $thisField) {
+				foreach($reportFields as $thisField => $fieldKey) {
 					$recordsByDate[$reportDate][$convertedValue][$thisField][] = $this->getConvertedValue($record, $thisField);
 				}
 			}
 		}
-		var_dump($recordsByDate);
-die("");
+
 		# Summarize the date by year and output category
-##TODO Continue Here
+		$datedSummaries = [];
 
-		## Currently have $deptRecords with all the user's department's information that is relevant to this search
-		## Also have $recordsByDate for every valid date for the query
-		$annualSummaries = [];
-		//echo "Report Fields: \n";
-		//var_dump($reportFields);echo "\n\n";
-		//var_dump($recordsByDate);echo "\n\n";
-
-		if($this->jsonData[self::LEVEL_OF_DATA] == "by_group") {
-			## Need to summarize data for each group (using $this->jsonData[self::TYPE_OF_DATA])
-			foreach($dateValues as $date) {
-				/** @var RecordSet $yearlyData */
-				$yearlyData = $recordsByDate[$date];
-
-//				echo "Year: $year\n\n";
-//				var_dump($yearlyData->getRecordIds());echo "\n\n";
-
-				if($this->tierGroupings == "") {
-					$groupList = array_unique($yearlyData->getDetails($compareField, false));
-				}
-				else {
-					$groupList = array_merge([0],$this->tierGroupings);
-				}
-
-				foreach($groupList as $groupKey => $groupName) {
-					if($this->tierGroupings == "") {
-						$groupData = $yearlyData->filterRecords([$compareField => $groupName]);
+		foreach($recordsByDate as $reportDate => $groupArray) {
+			foreach($groupArray as $groupName => $fieldArray) {
+				foreach($fieldArray as $fieldName => $fieldValues) {
+					if($this->project->getMetadata($fieldName)->getElementEnum() != "") {
+						$newValue = array_count_values($fieldValues);
 					}
-					else {
-						if($groupKey == (count($groupList) - 1)) {
-							$groupData = $yearlyData->filterRecords([RecordSet::getKeyComparatorPair($compareField,">=") => $groupName]);
-						}
-						else {
-							$groupData = $yearlyData->filterRecords([RecordSet::getKeyComparatorPair($compareField,">=") => $groupName,
-																	RecordSet::getKeyComparatorPair($compareField,"<") => $groupList[$groupKey + 1]]);
-						}
+					else if(isset($this->tierGroupings[$fieldName])) {
+
+					}
+					else if($this->jsonData[self::TYPE_OF_DATA] == self::AVERAGE) {
+						$newValue = array_sum($fieldValues)/count($fieldValues);
+					}
+					else if($this->jsonData[self::TYPE_OF_DATA] == self::TOTAL) {
+						$newValue = array_sum($fieldValues);
+					}
+					else if($this->jsonData[self::TYPE_OF_DATA] == self::COUNT) {
+						$newValue = array_count_values($fieldValues);
 					}
 
-					if($this->tierGroupings != "") {
-						$groupName = ($groupKey < (count($groupList) - 1) ? $groupName . " - " . $groupList[$groupKey + 1] : ">" . $groupName);
-					}
-					else if($this->project->getMetadata($compareField)->getElementEnum() != "") {
-						$enum = Project::convertEnumToArray($this->project->getMetadata($compareField)->getElementEnum());
-
-						$groupName = $enum[$groupName];
-					}
-
-					foreach($reportFields as $field => $number) {
-						$annualSummaries[$date][$groupName][$field] = [];
-
-						foreach($groupData->getRecords() as $newRecord) {
-							$annualSummaries[$date][$groupName][$field][] = $newRecord->getDetails($field);
-						}
-					}
-				}
-			}
-		}
-		else if($this->jsonData[self::LEVEL_OF_DATA] == "inGroup") {
-			## TODO: Do we display a summary of the non-user hospitals or each of the non-user hospitals?
-			foreach($dateValues as $date) {
-				$thisYearsRecord = reset($deptRecords->filterRecords([$dateField => $date])->getRecords());
-
-				foreach($reportFields as $field => $number) {
-					$annualSummaries[$date][self::SELF_GET][$field] = $thisYearsRecord->getDetails($field);
-				}
-
-				foreach($reportFields as $field => $number) {
-					$annualSummaries[$date]["Similar EDs"][$field] = [];
-				}
-
-				foreach($reportFields as $field => $number) {
-					foreach($recordsByDate[$date]->getRecords() as $newRecord) {
-						if($newRecord->getId() == $thisYearsRecord->getId()) { continue; }
-
-						$annualSummaries[$date]["Similar EDs"][$field][] = $newRecord->getDetails($field);
-					}
+					$datedSummaries[$reportDate][$groupName][$fieldName] = $newValue;
 				}
 			}
 		}
 
-//		var_dump($annualSummaries);echo "<br /><br />\n\n";
-
-		# Go through the data and make the summary information TODO: count and total data
-		foreach($annualSummaries as $year => $yearData) {
-			foreach($yearData as $groupName => $groupData) {
-				if($groupName == self::SELF_GET) continue;
-
-				foreach ($groupData as $field => $fieldData) {
-					if($this->project->getMetadata($field)->getElementEnum() != "") {
-						$enum = Project::convertEnumToArray($this->project->getMetadata($field)->getElementEnum());
-						$counts = array_count_values($fieldData);
-						$combinedData = [];
-
-						foreach($counts as $value => $count) {
-							$combinedData[] = round($count / count($fieldData) * 100)."% {$enum[$value]}";
-						}
-
-						$annualSummaries[$year][$groupName][$field] = implode("\n",$combinedData);
-					}
-					else if ($this->jsonData[self::TYPE_OF_DATA] == "average") {
-						$annualSummaries[$year][$groupName][$field] = array_sum($fieldData) / count($fieldData);
-					}
-                    else if ($this->jsonData[self::TYPE_OF_DATA] == "total") {
-                        $annualSummaries[$year][$groupName][$field] = array_sum($fieldData);
-                    }
-                    else if ($this->jsonData[self::TYPE_OF_DATA] == "count") {
-                        $annualSummaries[$year][$groupName][$field] = count($fieldData);
-                    }
-				}
-			}
-		}
-
-		return json_encode($annualSummaries);
+		return json_encode($datedSummaries);
 	}
 
 	public function pullGroupTiersFromMetadata() {
