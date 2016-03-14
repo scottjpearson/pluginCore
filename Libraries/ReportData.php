@@ -208,8 +208,12 @@ class ReportData {
 		foreach($recordsByDate as $reportDate => $groupArray) {
 			foreach($groupArray as $groupName => $fieldArray) {
 				foreach($fieldArray as $fieldName => $fieldValues) {
-					if($this->project->getMetadata($fieldName)->getElementEnum() != "") {
-						$newValue = array_count_values($fieldValues);
+					if($this->project->getMetadata($fieldName)->getElementEnum() != "" && ($this->project->getMetadata($fieldName)->getElementType() == "radio" || $this->project->getMetadata($fieldName)->getElementType() == "yesno" ) && $this->project->getMetadata($fieldName)->getElementType() != "calc") {
+                        $newValue = array();
+                        $counts = array_count_values($fieldValues);
+                        foreach (\Plugin\Project::convertEnumToArray($this->project->getMetadata($fieldName)->getElementEnum()) as $key => $enum) {
+                            isset($counts[$key]) ? $newValue[$key] = $counts[$key] : $newValue[$key] = 0;
+                        }
 					}
 					else if(isset($this->tierGroupings[$fieldName])) {
 
