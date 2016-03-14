@@ -134,7 +134,7 @@ class ReportData {
 		if(in_array($this->jsonData[self::LEVEL_OF_DATA], array(self::SITE_LEVEL_DATA, self::GROUP_LEVEL_DATA))) {
 			# Get converted value if if exists and parse the string to find the range to filter within
 			if(isset($this->tierGroupings[$this->jsonData[self::COMPARE_BY_FIELD]])) {
-				$convertedValue = reset($deptRecords->getRecords())->getDetails($this->jsonData[self::COMPARE_BY_FIELD]);
+				$convertedValue = $this->getConvertedRecord(reset($deptRecords->getRecords()), $this->jsonData[self::COMPARE_BY_FIELD]);
 				if($valuePos = strpos($convertedValue,"< ")) {
 					$valueRange[1] = substr($convertedValue,$valuePos);
 					$allRecords->filterRecords([RecordSet::getKeyComparatorPair($this->jsonData[self::COMPARE_BY_FIELD],"<") => $valueRange[1]]);
@@ -188,7 +188,7 @@ class ReportData {
 			}
 
 			foreach($filteredRecords->getRecords() as $record) {
-				$convertedValue = $this->getConvertedValue($record, $this->jsonData[self::COMPARE_BY_FIELD]);
+				$convertedValue = $this->getConvertedRecord($record, $this->jsonData[self::COMPARE_BY_FIELD]);
 
 				if(!isset($recordsByDate[$reportDate][$convertedValue])) {
 					foreach($reportFields as $thisField => $fieldKey) {
@@ -197,7 +197,7 @@ class ReportData {
 				}
 
 				foreach($reportFields as $thisField => $fieldKey) {
-					$recordsByDate[$reportDate][$convertedValue][$thisField][] = $this->getConvertedValue($record, $thisField);
+					$recordsByDate[$reportDate][$convertedValue][$thisField][] = $this->getConvertedRecord($record, $thisField);
 				}
 			}
 		}
@@ -250,13 +250,13 @@ class ReportData {
 		}
 	}
 
-	public function getConvertedValue($record, $fieldName) {
+	public function getConvertedValue($value, $fieldName) {
 		if(!isset($this->tierGroupings[$fieldName])) {
-			return $record->getDetails($fieldName);
+			return $value;
 		}
 
 		foreach($this->tierGroupings[$fieldName] as $groupKey => $maxThreshold) {
-			if($record->getDetails($fieldName) < $maxThreshold) {
+			if($value < $maxThreshold) {
 				if($groupKey == 0) {
 					return "< $maxThreshold";
 				}
@@ -266,6 +266,10 @@ class ReportData {
 			}
 			return ">= $maxThreshold";
 		}
+	}
+
+	public function getConvertedRecord($record, $fieldName) {
+		$this->getConvertedValue($record->getDetails($fieldName), $fieldName);
 	}
 
 	public function convertDate($date, $startOfRange = true) {
