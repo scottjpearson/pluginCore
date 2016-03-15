@@ -105,6 +105,7 @@ class ReportData {
 			$deptRecords = new RecordSet($this->project, [$this->jsonData[self::SITE_IDENTIFIER_FIELD] => $this->jsonData[self::SITE_IDENTIFIER_VALUE],
 					RecordSet::getKeyComparatorPair($this->project->getFirstFieldName(), "IN") => $recordsInDateRange]);
 
+
 			# If found no records, return a blank json string
 			if(count($deptRecords->getRecordIds()) == 0) {
 				$returnValues = array("" => array());
@@ -121,15 +122,16 @@ class ReportData {
 			$allRecordsInDateRange = getRecordsCreatedFrom($this->project, $startDate, $endDate);
 		}
 		else {
+
 			$inRangeRecordSet = new RecordSet($this->project, [RecordSet::getKeyComparatorPair($dateField,">=") => $startDate,
 					RecordSet::getKeyComparatorPair($dateField,"<=") => $endDate]);
 
 			$allRecordsInDateRange = $inRangeRecordSet->getRecordIds();
 
 			$allRecordsInDateRange = $allRecordsInDateRange == "" ? [] : $allRecordsInDateRange;
+
 		}
 		$allRecords = new RecordSet($this->project, [RecordSet::getKeyComparatorPair($this->project->getFirstFieldName(), "IN") => $allRecordsInDateRange]);
-
 		## For in group comparisons, filter out records outside of the group
 		if(in_array($this->jsonData[self::LEVEL_OF_DATA], array(self::SITE_LEVEL_DATA, self::GROUP_LEVEL_DATA))) {
 			# Get converted value if if exists and parse the string to find the range to filter within
@@ -151,6 +153,7 @@ class ReportData {
 			}
 			# If no tiered groupings, just need to find all the records that match the site's record
 			else {
+
 				$allRecords = $allRecords->filterRecords([$this->jsonData[self::COMPARE_BY_FIELD] => reset($deptRecords->getRecords())->getDetails($this->jsonData[self::COMPARE_BY_FIELD])]);
 			}
 		}
@@ -170,9 +173,9 @@ class ReportData {
 		}
 		else {
 			$dateList = $this->convertDate($deptRecords->getDetails($this->jsonData[self::DATE_FIELD]));
-		}
+        }
 		$dateList = array_unique($dateList);
-		sort($dateList);
+		asort($deptRecords->getDetails($this->jsonData[self::DATE_FIELD]));
 
 		$recordsByDate = [];
 		foreach($dateList as $reportDate) {
@@ -188,7 +191,8 @@ class ReportData {
 			}
 
 			foreach($filteredRecords->getRecords() as $record) {
-				$convertedValue = $this->getConvertedRecord($record, $this->jsonData[self::COMPARE_BY_FIELD]);
+                $convertedValue = $this->getConvertedValue($record->getDetails($this->jsonData[self::COMPARE_BY_FIELD]), $this->jsonData[self::COMPARE_BY_FIELD]);
+
 
 				if(!isset($recordsByDate[$reportDate][$convertedValue])) {
 					foreach($reportFields as $thisField => $fieldKey) {
@@ -197,14 +201,13 @@ class ReportData {
 				}
 
 				foreach($reportFields as $thisField => $fieldKey) {
-					$recordsByDate[$reportDate][$convertedValue][$thisField][] = $this->getConvertedRecord($record, $thisField);
+					$recordsByDate[$reportDate][$convertedValue][$thisField][] = $this->getConvertedValue($record->getDetails($thisField), $thisField);
 				}
 			}
 		}
-
+//        print_r($convertedValue);
 		# Summarize the date by year and output category
 		$datedSummaries = [];
-
 		foreach($recordsByDate as $reportDate => $groupArray) {
 			foreach($groupArray as $groupName => $fieldArray) {
 				foreach($fieldArray as $fieldName => $fieldValues) {
@@ -216,7 +219,7 @@ class ReportData {
                         }
 					}
 					else if(isset($this->tierGroupings[$fieldName])) {
-
+                        $newValue = $this->getConvertedValue($fieldValues, $fieldName);
 					}
 					else if($this->jsonData[self::TYPE_OF_DATA] == self::AVERAGE) {
 						$newValue = array_sum($fieldValues)/count($fieldValues);
@@ -268,6 +271,7 @@ class ReportData {
 		}
 	}
 
+    ## not sure if this function is even needed since its just a call to the above function and if you have the record and field name then you can just use the above.
 	public function getConvertedRecord($record, $fieldName) {
 		$this->getConvertedValue($record->getDetails($fieldName), $fieldName);
 	}
