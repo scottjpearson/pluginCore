@@ -108,10 +108,12 @@ class ReportData {
 
 			# If found no records, return a blank json string
 			if(count($deptRecords->getRecordIds()) == 0) {
-				$returnValues = array("" => array());
+				$returnValues = array("" => array("" => array()));
+                $returnArray = array();
 				foreach($reportFields as $fieldName => $fieldKey) {
-					$returnValues[""][] = array($fieldName => 0);
+					$returnArray[] = array($fieldName => 0);
 				}
+                $returnValues[""][""] = $returnArray;
 				return json_encode($returnValues);
 			}
 		}
