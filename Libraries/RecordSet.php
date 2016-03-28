@@ -279,6 +279,14 @@ class RecordSet {
 					$comparator = $keyComparatorPair[1];
 				}
 
+				# Check if the field is a date on any project and convert the value if it is
+				foreach($this->projects->getProjects() as $tempProject) {
+					if($tempProject->isDate($key)) {
+						$value = date('Y-m-d',strtotime($value));
+						break;
+					}
+				}
+
 				$fieldNames = explode("|",$key);
 
 				$fromClause .= ($fromClause == "" ? "\nFROM " : ", ") . "redcap_data d" . $tableKey;
