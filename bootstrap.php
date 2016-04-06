@@ -1,6 +1,6 @@
 <?php
 $doNotLoad = false;
-if(class_exists("Plugin_Core",false)) {
+if(isset($GLOBALS['Core'])) {
 	$doNotLoad = true;
 }
 ## Include the Core object
