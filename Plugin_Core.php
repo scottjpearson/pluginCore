@@ -4,6 +4,8 @@ class Plugin_Core
 {
 	private $includedLibraries = array();
 
+	const PLUGIN_HOME_DIRECTORY = 'PLUGIN_HOME_DIRECTORY';
+
     public function Libraries( $libraries = array() , $preloadInstance = true)
     {
         $success = true;
@@ -149,6 +151,9 @@ class Plugin_Core
     
     private function currentDirectory()
     {
+		if(defined(self::PLUGIN_HOME_DIRECTORY)) {
+			return constant(self::PLUGIN_HOME_DIRECTORY);
+		}
         return getcwd();
     }
 
