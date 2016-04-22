@@ -156,7 +156,7 @@ class Passthru {
 						AND p.project_id = s.project_id
 						AND m.project_id = p.project_id
 						AND s.form_name = m.form_name
-						".($formName != "" ? "AND s.form_name = '$formName'" : "")
+						".($formName != "" ? (is_numeric($formName) ? "AND s.survey_id = '$formName'" : "AND s.form_name = '$formName'") : "")
 				." LIMIT 1";
 
 		$q = db_query($sql);

@@ -228,6 +228,7 @@ class RecordSet {
 
 	/**
 	 * @param $newRecords \Plugin\RecordSet|Array
+	 * @return \Plugin\RecordSet
 	 */
 	public function appendRecords($newRecords) {
 		$this->fetchRecords();
