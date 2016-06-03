@@ -40,6 +40,7 @@ class ReportData {
     const BY_YEAR = "by_year";
     const BY_MONTH = "by_month";
     const EXACT_DATES = "exact_dates";
+    const ALL_DATES = "all_dates";
 
 	/**
 	 * @param $project \Plugin\Project
@@ -56,7 +57,7 @@ class ReportData {
 	}
 
 	public function getReportData() {
-		$compareField = $this->jsonData[self::COMPARE_BY_FIELD];
+	$compareField = $this->jsonData[self::COMPARE_BY_FIELD];
         $dateField = $this->jsonData[self::DATE_FIELD];
         $dateRange = $this->jsonData[self::DATE_RANGE];
 
@@ -68,25 +69,36 @@ class ReportData {
 
 		## If identifier fields are not well specified, switch to global data mode
 		if($this->jsonData[self::SITE_IDENTIFIER_FIELD] == "" || $this->jsonData[self::SITE_IDENTIFIER_VALUE] == "") {
-			$this->jsonData[self::DATE_GROUPING_TYPE] = self::GLOBAL_LEVEL_DATA;
+			$this->jsonData[self::LEVEL_OF_DATA] = self::GLOBAL_LEVEL_DATA;
 		}
 
 		# Get and format start and end dates based on $dateGrouping and $dateRange
 		$startDate = $dateRange;
 		$endDate = $dateRange;
-
+		
+		
 		if($dateRange == "") {
 			$startDate = 0;
-			$endDate = strtotime(date("2050-01-01"));
+			$endDate = strtotime("2030-01-01");
 		}
 		else if(count($dateRange) > 1) {
 			$startDate = strtotime($dateRange[0]);
 			$endDate = strtotime($dateRange[1]);
 		}
+		
+	
+		//die( $startDate . '  ::  ' . $endDate );
+	
+		## Kyle told me to do this - phelpsbk
+		if( $this->jsonData[self::DATE_GROUPING_TYPE] != self::ALL_DATES )
+		{
+			$startDate = $this->convertDate($startDate, true);
+			$endDate = $this->convertDate($endDate, false);
+		}
+		
 
-		$startDate = $this->convertDate($startDate, true);
-		$endDate = $this->convertDate($endDate, false);
-
+		//die( $startDate . '  ::  ' . $endDate . ' (BOOM)' );
+		
 		# Find list of records that fit in the start and end dates
 		if($this->jsonData[self::LEVEL_OF_DATA] != self::GLOBAL_LEVEL_DATA) {
 			if ($dateField == "") {
@@ -133,7 +145,9 @@ class ReportData {
 			$allRecordsInDateRange = $allRecordsInDateRange == "" ? [] : $allRecordsInDateRange;
 
 		}
+
 		$allRecords = new RecordSet($this->project, [RecordSet::getKeyComparatorPair($this->project->getFirstFieldName(), "IN") => $allRecordsInDateRange]);
+
 		## For in group comparisons, filter out records outside of the group
 		if(in_array($this->jsonData[self::LEVEL_OF_DATA], array(self::SITE_LEVEL_DATA, self::GROUP_LEVEL_DATA))) {
 			# Get converted value if if exists and parse the string to find the range to filter within
@@ -163,6 +177,10 @@ class ReportData {
 		if(!isset($deptRecords)) {
 			$deptRecords = $allRecords;
 		}
+
+        if (is_null($deptRecords)){
+            return array("" => array("" => array()));
+        }
 
 		# Group the data together by year and output category(compare by group) while dividing by denominator
 		if($this->jsonData[self::DATE_FIELD] == "") {
@@ -287,16 +305,22 @@ class ReportData {
 		}
 		
 		foreach($dateArray as &$thisDate) {
+			//print $thisDate . ' 0<br/>';
 			if ($this->jsonData[self::DATE_GROUPING_TYPE] == self::BY_MONTH || $this->jsonData[self::DATE_GROUPING_TYPE] == self::BY_YEAR) {
 				$thisDate = is_numeric($thisDate) ? $thisDate : strtotime($thisDate);
 			}
 
 			if ($this->jsonData[self::DATE_GROUPING_TYPE] == self::BY_MONTH) {
 				if ($startOfRange) {
-					$thisDate = strtotime(date("Y-m", $thisDate) . "-1");
+					//print $thisDate . ' 1<br/>';
+					$thisDate = date("Y-m-01", $thisDate);
+					//print $thisDate . ' 1<br/>';
 				} else {
-					$thisDate = strtotime(date("Y", $thisDate) . "-" . (date("m", $thisDate) + 1) . "-0");
+					//print $thisDate . ' 2<br/>';
+					$thisDate = date("Y-m-t", $thisDate);
+					//print $thisDate . ' 2<br/>';
 				}
+				
 			}
 			else if ($this->jsonData[self::DATE_GROUPING_TYPE] == self::BY_YEAR) {
 				if ($startOfRange) {
@@ -304,7 +328,16 @@ class ReportData {
 				} else {
 					$thisDate = strtotime((date("Y", $thisDate) + 1) . "-1-0");
 				}
+				//print 'YEAR';
 			}
+            else if ($this->jsonData[self::DATE_GROUPING_TYPE] == self::ALL_DATES){
+                //print 'ALL DATES';
+		if ($startOfRange){
+                    $thisDate = 0;
+                } else {
+                    $thisDate = strtotime(date('2030-01-01'));
+                }
+            }
 		}
 
 		if(!is_array($date)) {

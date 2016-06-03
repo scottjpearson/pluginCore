@@ -238,6 +238,32 @@ class Project {
 
         return false;
     }
+    
+    ## Determine if a form is locked for a given record
+    public final function isRecordFormLocked( $form = NULL, $record = NULL )
+    {
+	## Get out of here
+        if( $record === NULL || $form === NULL ) return false;
+	
+	## Is the form in the proper format (stirng)
+	if( is_string( $form ) )
+	{
+		$sql = "SELECT record 
+			FROM redcap_locking_data
+			WHERE project_id = '".$this->getProjectId()."'
+			AND record = '".$record."'
+			AND form_name = '".$form."'
+			AND event_id = '".$this->getEventId()."'";
+			
+		//die( $sql );	
+		$results = db_query( $sql );
+		
+		if( db_num_rows($results) > 0 ) return true;
+	}
+	
+	return false;
+    }
+    
 
 	# Pull the next auto ID for the project and save it
 	public final function getAutoId() {
