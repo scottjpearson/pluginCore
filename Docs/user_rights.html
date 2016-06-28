@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Core::UserRights</title>
+
+    <style type='text/css' media='all'>@import url('./userguide.css');</style>
+    <link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+
+    <meta http-equiv='expires' content='-1' />
+    <meta http-equiv= 'pragma' content='no-cache' />
+    <meta name='robots' content='all' />
+
+</head>
+<body>
+
+<!-- START NAVIGATION -->
+<div id="nav"><div id="nav_inner"></div></div>
+<div id="nav2"><a name="top">&nbsp;</a></div>
+<!-- END NAVIGATION -->
+
+
+<!-- START BREADCRUMB -->
+<!-- END BREADCRUMB -->
+
+<br clear="all" />
+
+
+<!-- START CONTENT -->
+<div id="content">
+
+
+    <h1>UserRights</h1>
+
+    <p>Used to get rights for a user for a given project.</p>
+
+    <p class="important"><strong>Dependencies:</strong>&nbsp;  <kbd>Project</kbd></p>
+
+    <p>Public Properties:</p>
+
+    <ul>
+        <li>lock_record</li>
+        <li>lock_record_multiform</li>
+        <li>data_export_tool</li>
+        <li>data_import_tool</li>
+        <li>data_comparison_tool</li>
+        <li>data_logging</li>
+        <li>file_repository</li>
+        <li>user_rights</li>
+        <li>has_access <strong>(does user have access to current)</strong></li>
+        <li>design</li>
+        <li>data_access_group</li>
+        <li>reports</li>
+        <li>calendar</li>
+        <li>data_entry</li>
+        <li>record_create</li>
+        <li>participants</li>
+        <li>role_name</li>
+        <li>dag_name</li>
+        <li>role_id</li>
+        <li>group_id</li>
+        <li>user_email</li>
+        <li>user_firstname</li>
+        <li>user_lastname</li>
+        <li>super_user</li>
+        <li>allow_create_db</li>
+    </ul>
+
+    <p>Public Functions:</p>
+    <ul>
+        <li>updateRights</li>
+    </ul>
+
+    <p>
+        <h2>updateRights( $newRights array() )</h2>
+        Inserts / updates the rights of the user for the currently defined project.  <strong>$newRights</strong> is
+        a key => value paired array.  Keys are the columns in <strong>REDCAP_USER_RIGHTS</strong> and values are their corresponding
+        values.
+
+        <code>
+            <-- CODE HERE -->
+        </code>
+    </p>
+
+    <p>Static Functions:</p>
+    <ul>
+        <li>getCurrentUserRights</li>
+        <li>getUsersByProject</li>
+        <li>getSetRightsSql</li>
+        <li>printRightsPage</li>
+    </ul>
+
+    <p>
+    <h2>getUsersByProject( Project $project )</h2>
+    Returns the UserRights
+
+    <code>
+        <-- CODE HERE -->
+    </code>
+    </p>
+
+
+
+
+
+
+</div>
+<!-- END CONTENT -->
+
+
+<div id="footer">
+</div>
+
+</body>
+</html>
