@@ -381,7 +381,7 @@ class Record {
 	# If the fieldName has no element_enum, or the stored value doesn't exist within it, the fieldName's value is returned instead.
 	public function getLabelData($fieldName) {
 		if($this->project->getMetadata($fieldName)->getElementType() == "yesno") {
-			return ($this->getDetails($fieldName) == 1 ? "Yes" : ($this->getDetails($fieldName) === 0 ? "No" : ""));
+			return ($this->getDetails($fieldName) == 1 ? "Yes" : ($this->getDetails($fieldName) === "0" || $this->getDetails($fieldName) === 0 ? "No" : ""));
 		}
 		$labelData = $this->project->renderEnumData($this->getDetails($fieldName),$this->project->getMetadata($fieldName)->getElementEnum());
 		if ($labelData == "") {
