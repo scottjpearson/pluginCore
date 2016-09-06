@@ -55,6 +55,12 @@ class Record {
 
 	# Publicly access the record details (or a particular column) for the record
 	# $forceRefresh causes the class to lookup the details from the database
+	/**
+	 * @param string $columnName
+	 * @param bool $forceRefresh
+	 * @return string|array
+	 * @throws Exception
+	 */
 	public function getDetails($columnName = "", $forceRefresh = false) {
 		$this->fetchDetails($forceRefresh);
 
