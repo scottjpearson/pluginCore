@@ -128,7 +128,6 @@ class UserRights {
 			if($row = db_fetch_assoc($query)) {
 				## Import all variables that are set by role
 				foreach(get_class_vars(get_class($this)) as $varName => $nullVal) {
-					echo "Checking $varName using ".$row[$varName]." and ".$row["role_".$varName]."<br />";
 					## Variables set by role will have by a standard and role_ version from the above query
 					if(isset($row[$varName]) && isset($row["role_".$varName])) {
 						## Override user_rights table with role version if the person has a role
