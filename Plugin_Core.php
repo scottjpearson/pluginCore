@@ -167,7 +167,7 @@ class Plugin_Core
         } else {
             $pageURL .= $_SERVER["SERVER_NAME"];
         }
-		$pageURL .= substr(__DIR__,strlen($_SERVER["DOCUMENT_ROOT"]));
+		$pageURL .= substr(__DIR__,strlen(realpath($_SERVER["DOCUMENT_ROOT"])));
         return $pageURL;
     }
 
