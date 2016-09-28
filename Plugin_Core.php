@@ -188,4 +188,17 @@ class Plugin_Core
     {
         print __DIR__;
     }
+
+    public static function displayErrorsAndWarnings()
+    {
+        ini_set('display_errors', 1);
+        error_reporting(E_ALL);
+        set_error_handler(function($errno){
+            if($errno != E_ERROR){
+                # REDCAP only shows E_ERROR messages by default.
+                # We return false here to enable other messages as well (like warnings).
+                return false;
+            }
+        });
+    }
 }

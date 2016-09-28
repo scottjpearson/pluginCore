@@ -113,6 +113,14 @@ class Metadata {
 	}
 
 	/**
+	 * @return mixed
+	 */
+	public function getElementEnumAsArray()
+	{
+		return Project::convertEnumToArray($this->getElementEnum());
+	}
+
+	/**
 	 * @param mixed $element_enum
 	 */
 	public function setElementEnum($element_enum)
