@@ -289,13 +289,18 @@ class RecordSet {
 
 				$fieldNames = explode("|",$key);
 
+				$valueSql = $value;
+				if(!is_numeric($value)){
+					$valueSql = "'$valueSql'";
+				}
+
 				$fromClause .= ($fromClause == "" ? "\nFROM " : ", ") . "redcap_data d" . $tableKey;
 				$whereClause .= ($whereClause == "" ? "\nWHERE " : "\nAND ") .
 					($tableKey == 1 ? "d$tableKey.project_id IN (" . implode(",",$this->projects->getProjectIds()) . ")\n" : "d$tableKey.project_id = d1.project_id\n") .
 					($tableKey == 1 ? "" : "AND d$tableKey.record = d1.record\n") .
 					"AND d$tableKey.field_name IN ('".implode("','",$fieldNames)."')\n".
-					"AND ".($this->caseSensitive ? "d$tableKey.value $comparator ".(is_array($value) ? "('".implode("','",$value)."')" : "'".$value."'") :
-						"LOWER(d$tableKey.value) $comparator ".strtolower(is_array($value) ? "('".implode("','",$value)."')" : "'".$value."'"));
+					"AND ".($this->caseSensitive ? "d$tableKey.value $comparator ".(is_array($value) ? "('".implode("','",$value)."')" : $valueSql) :
+						"LOWER(d$tableKey.value) $comparator ".strtolower(is_array($value) ? "('".implode("','",$value)."')" : $valueSql));
 
 				$tableKey++;
 			}
