@@ -307,8 +307,6 @@ class RecordSet {
 					"AND ".($this->caseSensitive ? "d$tableKey.value $comparator ".$valueSql :
 						"LOWER(d$tableKey.value) $comparator ".strtolower($valueSql));
 
-				die($whereClause);
-
 				$tableKey++;
 			}
 
