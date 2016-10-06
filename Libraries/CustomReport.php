@@ -17,9 +17,9 @@ class CustomReport
 		$this->project = new Project($pid);
 	}
 
-	function getHeaderLabel($field)
+	function getHeaderLabel($fieldName)
 	{
-		$label = $this->getMetadata($field)->getElementPrecedingHeader();
+		$label = $this->getMetadata($fieldName)->getElementPrecedingHeader();
 		$label = str_replace("\n", "", $label);
 		$label = str_replace("</", "\n</", $label);
 		$label = strip_tags($label);
@@ -30,15 +30,15 @@ class CustomReport
 		return $label;
 	}
 
-	function getChoiceLabel($field, $recordId)
+	function getChoiceLabel($fieldName, $recordId)
 	{
-		$value = $this->getValue($field, array($recordId));
+		$value = $this->getValue($fieldName, array($recordId));
 
 		if(is_null($value)){
 			return 'N/A';
 		}
 
-		$choices = $this->getChoices($field);
+		$choices = $this->getChoices($fieldName);
 		$label = @$choices[$value];
 		if(!isset($label)){
 			# This means a value is stored that does not match a choice for this field.
@@ -50,9 +50,9 @@ class CustomReport
 		return $label;
 	}
 
-	function getChoices($field)
+	function getChoices($fieldName)
 	{
-		$metadata = $this->getMetadata($field);
+		$metadata = $this->getMetadata($fieldName);
 		if($metadata->getElementType() == self::TYPE_YESNO){
 			return array(1=>'Yes', 0=>'No');
 		}
@@ -61,28 +61,28 @@ class CustomReport
 		}
 	}
 
-	function countChoices($field, $recordIds)
+	function countChoices($fieldName, $recordIds)
 	{
-		$choices = $this->getChoices($field);
+		$choices = $this->getChoices($fieldName);
 		$choiceCounts = array();
 
 		foreach($choices as $number=>$label){
-			$count = count($this->getRecordsWithValue($field, $number, $recordIds));
+			$count = count($this->getRecordsWithValue($fieldName, $number, $recordIds));
 			$choiceCounts[$number] = $count;
 		}
 
 		return $choiceCounts;
 	}
 
-	function getAverage($field, $recordIds = null)
+	function getAverage($fieldName, $recordIds = null)
 	{
-		$value = $this->format($this->getValue($field, $recordIds, 'avg'));
+		$value = $this->format($this->getValue($fieldName, $recordIds, 'avg'));
 
 		if(is_null($value)){
 			return 'N/A';
 		}
 
-		if( $this->getMetadata($field)->getElementNote() == 'Percentage'){
+		if( $this->getMetadata($fieldName)->getElementNote() == 'Percentage'){
 			$value .= '%';
 		}
 
@@ -110,14 +110,14 @@ class CustomReport
 		return $value;
 	}
 
-	function getChoicePercentages($field, $recordIds)
+	function getChoicePercentages($fieldName, $recordIds)
 	{
-		$counts = $this->countChoices($field, $recordIds);
+		$counts = $this->countChoices($fieldName, $recordIds);
 
 		$total = 0;
 		if(!empty($recordIds)){
 			$fieldAnsweredRecordSet = new RecordSet($this->project, array(
-				RecordSet::getKeyComparatorPair($field, "!=") => null,
+				RecordSet::getKeyComparatorPair($fieldName, "!=") => null,
 				RecordSet::getKeyComparatorPair($this->project->getFirstFieldName(), "IN") => $recordIds
 			));
 
@@ -134,12 +134,12 @@ class CustomReport
 			}
 		}
 
-		$percentages = $this->sortChoicePercentages($field, $recordIds, $percentages);
+		$percentages = $this->sortChoicePercentages($fieldName, $recordIds, $percentages);
 
 		return $percentages;
 	}
 
-	function sortChoicePercentages($field, $recordIds, $percentages)
+	function sortChoicePercentages($fieldName, $recordIds, $percentages)
 	{
 		if($recordIds == $this->yearRecordIds){
 			$yearPercentages = $percentages;
@@ -147,11 +147,11 @@ class CustomReport
 		else{
 			# This will cause some recalculation that could be prevented via caching.
 			# However, the performance gain would likely not be enough to warrant implementing caching.
-			$yearPercentages = $this->getChoicePercentages($field, $this->yearRecordIds);
+			$yearPercentages = $this->getChoicePercentages($fieldName, $this->yearRecordIds);
 		}
 
-		uksort($percentages, function($key1, $key2) use ($field, $percentages, $yearPercentages){
-			$choices = $this->getChoices($field);
+		uksort($percentages, function($key1, $key2) use ($fieldName, $percentages, $yearPercentages){
+			$choices = $this->getChoices($fieldName);
 			$key1Label = $choices[$key1];
 			$key2Label = $choices[$key2];
 
@@ -178,9 +178,9 @@ class CustomReport
 		return in_array(strtolower($label), array('other', 'none'));
 	}
 
-	function getChoicePercentage($field, $value, $recordIds)
+	function getChoicePercentage($fieldName, $value, $recordIds)
 	{
-		$percentages = $this->getChoicePercentages($field, $recordIds);
+		$percentages = $this->getChoicePercentages($fieldName, $recordIds);
 		$percentage = @$percentages[$value];
 
 		if(is_null($percentage)){
@@ -190,21 +190,21 @@ class CustomReport
 		return $percentage;
 	}
 
-	function getRecordsWithValue($field, $value, $recordIds){
+	function getRecordsWithValue($fieldName, $value, $recordIds){
 
 		if(count($recordIds) == 0){
 			return array();
 		}
 
 		$set = new RecordSet($this->project, array(
-			RecordSet::getKeyComparatorPair($field, "=") => $value,
+			RecordSet::getKeyComparatorPair($fieldName, "=") => $value,
 			RecordSet::getKeyComparatorPair($this->project->getFirstFieldName(), "IN") => $recordIds
 		));
 
 		return $set->getRecordIds();
 	}
 
-	function getValues($field, $recordIds, $aggregateFunction = null)
+	function getValues($fieldName, $recordIds, $aggregateFunction = null)
 	{
 		if(!is_array($recordIds)){
 			$recordIds = array($recordIds);
@@ -214,7 +214,7 @@ class CustomReport
 			return array();
 		}
 
-		$field = db_real_escape_string($field);
+		$fieldName = db_real_escape_string($fieldName);
 		$recordIds = db_real_escape_string(implode(",", $recordIds));
 
 		$valueSql = 'value';
@@ -226,7 +226,7 @@ class CustomReport
 		$sql = "SELECT $valueSql as value
 			FROM redcap_data d1
 			WHERE d1.project_id IN ($this->pid)
-			AND d1.field_name  = '$field'
+			AND d1.field_name  = '$fieldName'
 			AND record in ($recordIds)";
 
 		$result = db_query($sql);
@@ -239,13 +239,13 @@ class CustomReport
 		return $values;
 	}
 
-	function getValue($field, $recordIds, $aggregateFunction = null)
+	function getValue($fieldName, $recordIds, $aggregateFunction = null)
 	{
 		if(!is_array($recordIds)){
 			$recordIds = array($recordIds);
 		}
 
-		$values = $this->getValues($field, $recordIds, $aggregateFunction);
+		$values = $this->getValues($fieldName, $recordIds, $aggregateFunction);
 
 		$count = count($values);
 		if($count == 0){
@@ -267,32 +267,32 @@ class CustomReport
 		throw new Exception("Expected one or zero values, but found $count values instead!");
 	}
 
-	function getLabel($field)
+	function getLabel($fieldName)
 	{
-		$metadata = $this->getMetadata($field);
+		$metadata = $this->getMetadata($fieldName);
 		$label = $metadata->getElementLabel();
 
 		return $label;
 	}
 
-	function getNote($field)
+	function getNote($fieldName)
 	{
-		return $this->getMetadata($field)->getElementNote();
+		return $this->getMetadata($fieldName)->getElementNote();
 	}
 
-	function isNumeric($field)
+	function isNumeric($fieldName)
 	{
-		$metadata = $this->getMetadata($field);
+		$metadata = $this->getMetadata($fieldName);
 		return $metadata->getElementType() == self::TYPE_CALC || in_array($metadata->getElementValidationType(), array('int', 'float'));
 	}
 
-	function getMetadata($field)
+	function getMetadata($fieldName)
 	{
-		$metadata = $this->project->getMetadata($field);
+		$metadata = $this->project->getMetadata($fieldName);
 
 		$type = $metadata->getElementType();
 		if(empty($type)){
-			throw new Exception('The specified field does not exist: ' . $field);
+			throw new Exception('The specified field does not exist: ' . $fieldName);
 		}
 
 		return $metadata;
