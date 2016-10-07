@@ -30,9 +30,12 @@ class LdapLookup {
 
 		if ($sr) {
 			$data = ldap_get_entries(self::$ldapConn, $sr);
-			foreach($data as $dataDetails) {
-				return $dataDetails;
+			for($i = 0; $i < count($data); $i++) {
+				return $data[$i];
 			}
+		}
+		else {
+			echo "<pre>";var_dump(ldap_error(self::$ldapConn));echo "</pre><br /><Br />";
 		}
 		return false;
 	}
