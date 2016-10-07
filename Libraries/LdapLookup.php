@@ -38,11 +38,11 @@ class LdapLookup {
 	}
 
 	public static function lookupUserDetailsByVunet($vunet) {
-		self::lookupUserDetailsByKey($vunet,self::VUNET_KEY);
+		return self::lookupUserDetailsByKey($vunet,self::VUNET_KEY);
 	}
 
 	public static function lookupUserDetailsByPersonId($personId) {
-		self::lookupUserDetailsByKey($personId,self::PERSON_ID_KEY);
+		return self::lookupUserDetailsByKey($personId,self::PERSON_ID_KEY);
 	}
 
 	public static function lookupUsersByNameFragment($nameFragment) {
