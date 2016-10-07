@@ -77,7 +77,7 @@ class CustomReport
 
 	function getAverage($fieldName, $recordIds = null)
 	{
-		$value = $this->format($this->getValue($fieldName, $recordIds, 'avg'));
+		$value = $this->format($fieldName, $this->getValue($fieldName, $recordIds, 'avg'));
 
 		if(is_null($value)){
 			return 'N/A';
@@ -90,7 +90,7 @@ class CustomReport
 		return $value;
 	}
 
-	function format($value){
+	function format($fieldName, $value){
 		if(is_numeric($value)){
 			if($value < 1000){
 				$decimalPoints = 1;
@@ -131,7 +131,7 @@ class CustomReport
 				$percentages[$number] = 'N/A';
 			}
 			else{
-				$percentages[$number] = $this->format(@$counts[$number]/$total*100) . '%';
+				$percentages[$number] = $this->format($fieldName, @$counts[$number]/$total*100) . '%';
 			}
 		}
 
@@ -185,7 +185,7 @@ class CustomReport
 		$percentage = @$percentages[$value];
 
 		if(is_null($percentage)){
-			$percentage = $this->format(0) . '%';
+			$percentage = $this->format($fieldName, 0) . '%';
 		}
 
 		return $percentage;
