@@ -317,4 +317,9 @@ class CustomReport
 
 		return $annotationDetails;
 	}
+
+	public function getType($field)
+	{
+		return $this->getMetadata($field)->getElementType();
+	}
 }
