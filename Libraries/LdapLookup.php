@@ -8,6 +8,8 @@
 
 namespace Plugin;
 
+use \Exception;
+
 class LdapLookup {
 	const VUNET_KEY = "uid";
 	const EMAIL_KEY = "mail";
@@ -22,6 +24,12 @@ class LdapLookup {
 	private static $ldapConn;
 	private static $ldapBind;
 
+	/**
+	 * @param $value string
+	 * @param $key string
+	 * @return array|bool
+	 * @throws Exception
+	 */
 	public static function lookupUserDetailsByKey($value,$key) {
 		self::initialize();
 
@@ -35,7 +43,10 @@ class LdapLookup {
 			}
 		}
 		else {
-			echo "<pre>";var_dump(ldap_error(self::$ldapConn));echo "</pre><br /><Br />";
+			if(ldap_error(self::$ldapConn) != "") {
+				echo "<pre>";var_dump(ldap_error(self::$ldapConn));echo "</pre><br /><Br />";
+				throw new Exception(ldap_error(self::$ldapConn));
+			}
 		}
 		return false;
 	}
