@@ -56,6 +56,9 @@ class LdapLookup {
 
 			return $data;
 		}
+		else {
+			echo "<pre>";var_dump(ldap_error(self::$ldapConn));echo "</pre><br /><Br />";
+		}
 		return false;
 	}
 
