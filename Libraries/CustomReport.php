@@ -10,6 +10,7 @@ class CustomReport
 	const TYPE_CALC = 'calc';
 	const TYPE_SELECT = 'select';
 	const TYPE_RADIO = 'radio';
+	const TYPE_CHECKBOX = 'checkbox';
 
 	function __construct($pid)
 	{
