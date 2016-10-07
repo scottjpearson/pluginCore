@@ -36,7 +36,7 @@ class CustomReport
 		$value = $this->getValue($fieldName, array($recordId));
 
 		if(is_null($value)){
-			return 'N/A';
+			return null;
 		}
 
 		$choices = $this->getChoices($fieldName);
@@ -45,7 +45,7 @@ class CustomReport
 			# This means a value is stored that does not match a choice for this field.
 			# This shouldn't happen, but I have seen on sample data.
 			# Behave as if the question was not answered.
-			return 'N/A';
+			return null;
 		}
 
 		return $label;
@@ -80,7 +80,7 @@ class CustomReport
 		$value = $this->format($fieldName, $this->getValue($fieldName, $recordIds, 'avg'));
 
 		if(is_null($value)){
-			return 'N/A';
+			return null;
 		}
 
 		if( $this->getMetadata($fieldName)->getElementNote() == 'Percentage'){
@@ -128,7 +128,7 @@ class CustomReport
 		$percentages = array();
 		foreach($counts as $number=>$count){
 			if($total == 0){
-				$percentages[$number] = 'N/A';
+				$percentages[$number] = '';
 			}
 			else{
 				$percentages[$number] = $this->format($fieldName, @$counts[$number]/$total*100) . '%';
