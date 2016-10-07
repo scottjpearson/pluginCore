@@ -177,6 +177,11 @@ class UserRights {
 		}
 	}
 
+	public function getGroupName()
+	{
+		return $this->project->getGroupName($this->group_id);
+	}
+
 	public static function getCurrentUserRights(Project $project) {
 		if(defined("USERID")) {
 			return new self($project, USERID);
