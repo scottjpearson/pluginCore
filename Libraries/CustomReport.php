@@ -77,17 +77,7 @@ class CustomReport
 
 	function getAverage($fieldName, $recordIds = null)
 	{
-		$value = $this->format($fieldName, $this->getValue($fieldName, $recordIds, 'avg'));
-
-		if(is_null($value)){
-			return null;
-		}
-
-		if( $this->getMetadata($fieldName)->getElementNote() == 'Percentage'){
-			$value .= '%';
-		}
-
-		return $value;
+		return $this->format($fieldName, $this->getValue($fieldName, $recordIds, 'avg'));
 	}
 
 	function format($fieldName, $value){
@@ -100,6 +90,11 @@ class CustomReport
 			}
 
 			$value = number_format($value, $decimalPoints);
+
+			if( $this->getMetadata($fieldName)->getElementNote() == 'Percentage'){
+				$value .= '%';
+			}
+
 		}
 		else if($value == 'YES'){
 			return 'Yes';
