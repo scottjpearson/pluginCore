@@ -56,6 +56,9 @@ class LdapLookup {
 	}
 
 	public static function lookupUserDetailsByPersonId($personId) {
+		if(is_numeric($personId) < 7) {
+			$personId = str_pad($personId,7,"0",STR_PAD_LEFT);
+		}
 		return self::lookupUserDetailsByKey($personId,self::PERSON_ID_KEY);
 	}
 
