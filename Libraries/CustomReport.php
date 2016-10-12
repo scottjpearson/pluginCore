@@ -80,16 +80,11 @@ class CustomReport
 		return $this->format($fieldName, $this->getValue($fieldName, $recordIds, 'avg'));
 	}
 
-	function format($fieldName, $value){
+	function format($fieldName, $value)
+	{
 		if(is_numeric($value)){
-			if($value < 1000){
-				$decimalPoints = 1;
-			}
-			else{
-				$decimalPoints = 0;
-			}
-
-			$value = number_format($value, $decimalPoints);
+			$decimalPlaces = $this->getDecimalPlaces($fieldName, $value);
+			$value = number_format($value, $decimalPlaces);
 
 			if( $this->getMetadata($fieldName)->getElementNote() == 'Percentage'){
 				$value .= '%';
@@ -104,6 +99,16 @@ class CustomReport
 		}
 
 		return $value;
+	}
+
+	function getDecimalPlaces($fieldName, $value)
+	{
+		if($value < 1000){
+			return 1;
+		}
+		else{
+			return 0;
+		}
 	}
 
 	function getChoicePercentages($fieldName, $recordIds)
