@@ -403,6 +403,7 @@ class Record {
     /**
      * Function that checks if a record exists in any of the other projects (PRE, BRIDGE, POST) and returns the page and projectID in a string
      * @param $recordID, the ID of the current record
+     * @param $projectRecords, array: page => projectID
      * @return string, returns the projectID and the Page
      */
     public static function recordExistsInProjects($recordID,$projectRecords){
