@@ -397,4 +397,41 @@ class Record {
 			return $labelData;
 		}
 	}
+
+    /**
+     * Function that checks if a record exists in any of the other projects (PRE, BRIDGE, POST) and returns the page and projectID in a string
+     * @param $recordID, the ID of the current record
+     * @return string, returns the projectID and the Page
+     */
+    public static function recordExistsInProjects($recordID,$projectRecords){
+        $projectRecord = "";
+        $projectRecordPage = "";
+        foreach ($projectRecords as $key=>$value){
+            if(Record::recordExistsInProject($recordID,$value) != false){
+                $projectRecord = $value;
+                $projectRecordPage = $key;
+            }
+        }
+        return "pid=".$projectRecord."&page=".$projectRecordPage;
+    }
+
+    /**
+     * Function that checks is a record exists in a certain project and returns a boolean
+     * @param $recordID, the ID of the current record
+     * @param $projectId,the ID of the current project
+     * @return bool, boolean that tells if the record exists in the project
+     */
+    public static function recordExistsInProject($recordID,$projectId){
+        $recordExists = true;
+        $Project = new \Plugin\Project($projectId);
+        $record = new \Plugin\Record($Project, array(array($Project->getFirstFieldName())), array($Project->getFirstFieldName() => $recordID));
+
+        try {
+            $record->getId();
+        } catch(Exception $e) {
+            $recordExists = false;
+        }
+
+        return $recordExists;
+    }
 }
