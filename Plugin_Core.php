@@ -167,7 +167,7 @@ class Plugin_Core
         } else {
             $pageURL .= $_SERVER["SERVER_NAME"];
         }
-		$pageURL .= substr(__DIR__,strlen($_SERVER["DOCUMENT_ROOT"]));
+		$pageURL .= substr(__DIR__,strlen(realpath($_SERVER["DOCUMENT_ROOT"])));
         return $pageURL;
     }
 
@@ -187,5 +187,42 @@ class Plugin_Core
     public function test()
     {
         print __DIR__;
+    }
+
+	public function getEnvironment() {
+		if(!defined("ENVIRONMENT")) {
+			# Define the environment: options include "DEV", "TEST" or "PROD"
+			if (is_file('/app001/victrcore/lib/Victr/Env.php'))
+				include_once('/app001/victrcore/lib/Victr/Env.php');
+
+			if(class_exists("Victr_Env")) {
+				$envConf = Victr_Env::getEnvConf();
+
+				if ($envConf[Victr_Env::ENV_CURRENT] === Victr_Env::ENV_PROD) {
+					define("ENVIRONMENT", "PROD");
+				}
+				elseif ($envConf[Victr_Env::ENV_CURRENT] === Victr_Env::ENV_DEV) {
+					define("ENVIRONMENT", "TEST");
+				}
+			}
+			else {
+				define("ENVIRONMENT", "DEV");
+			}
+		}
+
+		return ENVIRONMENT;
+	}
+
+    public static function displayErrorsAndWarnings()
+    {
+        ini_set('display_errors', 1);
+        error_reporting(E_ALL);
+        set_error_handler(function($errno){
+            if($errno != E_ERROR){
+                # REDCAP only shows E_ERROR messages by default.
+                # We return false here to enable other messages as well (like warnings).
+                return false;
+            }
+        });
     }
 }

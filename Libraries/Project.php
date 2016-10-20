@@ -369,6 +369,28 @@ class Project {
 		return $this->projectDetails;
 	}
 
+	public function getGroupName($groupId)
+	{
+		# Prevent SQL Injection
+		$groupId = intval($groupId);
+
+		$pid = $this->projectId;
+		$sql = "SELECT group_name
+				FROM redcap_data_access_groups
+				WHERE
+					project_id = $pid
+					and group_id = $groupId";
+
+		$result = db_query($sql);
+
+		if(!$result){
+			return null;
+		}
+
+		$row = db_fetch_assoc($result);
+		return $row['group_name'];
+	}
+
 	/*
 	 * @return \Plugin\Project
 	 * @param $projectId Int

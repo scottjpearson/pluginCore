@@ -289,13 +289,23 @@ class RecordSet {
 
 				$fieldNames = explode("|",$key);
 
+				if(is_array($value)){
+					$valueSql = "('".implode("','",$value)."')";
+				}
+				else if(is_numeric($value)){
+					$valueSql = $value;
+				}
+				else{
+					$valueSql = "'$value'";
+				}
+
 				$fromClause .= ($fromClause == "" ? "\nFROM " : ", ") . "redcap_data d" . $tableKey;
 				$whereClause .= ($whereClause == "" ? "\nWHERE " : "\nAND ") .
 					($tableKey == 1 ? "d$tableKey.project_id IN (" . implode(",",$this->projects->getProjectIds()) . ")\n" : "d$tableKey.project_id = d1.project_id\n") .
 					($tableKey == 1 ? "" : "AND d$tableKey.record = d1.record\n") .
 					"AND d$tableKey.field_name IN ('".implode("','",$fieldNames)."')\n".
-					"AND ".($this->caseSensitive ? "d$tableKey.value $comparator ".(is_array($value) ? "('".implode("','",$value)."')" : "'".$value."'") :
-						"LOWER(d$tableKey.value) $comparator ".strtolower(is_array($value) ? "('".implode("','",$value)."')" : "'".$value."'"));
+					"AND ".($this->caseSensitive ? "d$tableKey.value $comparator ".$valueSql :
+						"LOWER(d$tableKey.value) $comparator ".strtolower($valueSql));
 
 				$tableKey++;
 			}
@@ -327,48 +337,58 @@ class RecordSet {
 		return $this->records;
 	}
 
-	protected function fetchDetails($columnName = "", $getIds = false) {
-		/* @var $record \Plugin\Record */
-		if(count($this->getRecords()) == 0) return NULL;
+    protected function fetchDetails($columnName = "", $getIds = false) {
+        /* @var $record \Plugin\Record */
+        if(count($this->getRecords()) == 0) return NULL;
 
-		$detailsArray = array();
+        $detailsArray = array();
+        $metaData = array();
+        if(!$this->detailsFetched) {
+            $whereString = "";
+            foreach($this->getRecords() as $record ) {
+                $whereString .= ($whereString == "" ? "" : " OR ")."(d.record = '".$record->getId()."' AND d.project_id = ".
+                    $record->getProjectObject()->getProjectId().")";
+                if (!isset($metaData[$record->getProjectObject()->getProjectId()])) {
+                    foreach ($record->getProjectObject()->getMetadata() as $fieldMeta) {
+                        $metaData[$record->getProjectObject()->getProjectId()][$fieldMeta->getFieldName()] = $fieldMeta->getElementType();
+                    }
+                }
+            }
 
-		if(!$this->detailsFetched) {
-			$whereString = "";
-			foreach($this->getRecords() as $record ) {
-				$whereString .= ($whereString == "" ? "" : " OR ")."(d.record = '".$record->getId()."' AND d.project_id = ".
-					$record->getProjectObject()->getProjectId().")";
-			}
-
-			$sql = "SELECT d.project_id, d.record, d.field_name, d.value
+            $sql = "SELECT d.project_id, d.record, d.field_name, d.value
 					FROM redcap_data d
 					WHERE $whereString";
 
-			if(!$result = db_query($sql)) throw new Exception("Error looking up RecordSet details",self::SQL_ERROR);
+            if(!$result = db_query($sql)) throw new Exception("Error looking up RecordSet details",self::SQL_ERROR);
 
-			while($row = db_fetch_assoc($result)) {
-				$detailsArray[$row['project_id']][$row["record"]][$row["field_name"]] = $row["value"];
-			}
+            while($row = db_fetch_assoc($result)) {
+                if (isset($metaData[$row['project_id']]) && $metaData[$row['project_id']][$row['field_name']] == "checkbox") {
+                    $detailsArray[$row['project_id']][$row["record"]][$row["field_name"]][] = $row["value"];
+                }
+                else {
+                    $detailsArray[$row['project_id']][$row["record"]][$row["field_name"]] = $row["value"];
+                }
+            }
 
-			foreach($this->fetchRecords() as $record) {
-				$record->setDetails($detailsArray[$record->getProjectObject()->getProjectId()][$record->getId()]);
-			}
-			$this->detailsFetched = true;
-		}
-		
-		$returnArray = array();
+            foreach($this->fetchRecords() as $record) {
+                $record->setDetails($detailsArray[$record->getProjectObject()->getProjectId()][$record->getId()]);
+            }
+            $this->detailsFetched = true;
+        }
 
-		foreach($this->fetchRecords() as $record) {
-			if($getIds) {
-				$returnArray[$record->getProjectObject()->getProjectId()][$record->getId()] = $record->getDetails($columnName);
-			}
-			else {
-				$returnArray[] = $record->getDetails($columnName);
-			}
-		}
-		
-		return $returnArray;
-	}
+        $returnArray = array();
+
+        foreach($this->fetchRecords() as $record) {
+            if($getIds) {
+                $returnArray[$record->getProjectObject()->getProjectId()][$record->getId()] = $record->getDetails($columnName);
+            }
+            else {
+                $returnArray[] = $record->getDetails($columnName);
+            }
+        }
+
+        return $returnArray;
+    }
 
 	/**
 	 * @param $keyName string

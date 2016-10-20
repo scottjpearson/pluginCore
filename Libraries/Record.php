@@ -247,13 +247,15 @@ class Record {
 		}
 
 		$column = 0;
-		foreach($this->keyValues as $key => $value) {
-			foreach($this->keys as $keyId => $keyColumns) {
-				if($keyColumns[$column] != $key || $value == "") {
-					$validKeys[$keyId] = false;
+		if($this->keyValues != ""){
+			foreach($this->keyValues as $key => $value) {
+				foreach($this->keys as $keyId => $keyColumns) {
+					if($keyColumns[$column] != $key || $value == "") {
+						$validKeys[$keyId] = false;
+					}
 				}
+				$column++;
 			}
-			$column++;
 		}
 
 		if(array_search(true,$validKeys) !== false) return true;
