@@ -23,6 +23,9 @@ class RecordSet {
 
 	private $keyValues;
 
+	private $currentSortFields = [];
+	private $currentSortDirection = false;
+
 	public static $debugSql = false;
 
 	/**
@@ -226,6 +229,90 @@ class RecordSet {
 		return $this->records;
 	}
 
+	public function mergeSortRecords($fieldName, $reverseSort = false) {
+		$this->fetchDetailsIfNot();
+
+		if(count($this->getRecords()) == 0) return;
+
+		if(is_array($fieldName)) {
+			$this->currentSortFields = $fieldName;
+		}
+		else if($fieldName != "") {
+			$this->currentSortFields = [$fieldName];
+		}
+		else {
+			$this->currentSortFields = [];
+		}
+		$this->currentSortDirection = $reverseSort;
+		$this->records = $this->splitMerge($this->getRecords());
+	}
+
+	private function remergeArray($a,$b) {
+		$merged = [];
+
+		while(count($a) > 0 && count($b) > 0) {
+			/** @var \Plugin\Record $currentA */
+			$currentA = reset($a);
+			/** @var \Plugin\Record $currentB */
+			$currentB = reset($b);
+
+			$useA = true;
+
+			foreach($this->currentSortFields as $fieldName) {
+				$aVal = $currentA->getDetails($fieldName);
+				$bVal = $currentB->getDetails($fieldName);
+				if($aVal == $bVal) {
+					continue;
+				}
+				$useA = !$this->currentSortDirection;
+				if($aVal > $bVal) {
+					$useA = $this->currentSortDirection;
+				}
+				break;
+			}
+
+			if($useA) {
+				$merged[] = array_shift($a);
+			}
+			else {
+				$merged[] = array_shift($b);
+			}
+		}
+
+		while(count($a) > 0) {
+			$merged[] = array_shift($a);
+		}
+		while(count($b) > 0) {
+			$merged[] = array_shift($b);
+		}
+
+		return $merged;
+	}
+
+	private function splitMerge($a) {
+		$end = count($a);
+		if($end == 1) {
+			return $a;
+		}
+		else {
+			$mid = $end / 2;
+			$left = [];
+			$right = [];
+			for($i = 0; $i < $end; $i++) {
+				if($i < $mid) {
+					$left[] = $a[$i];
+				}
+				else {
+					$right[] = $a[$i];
+				}
+			}
+			$left = $this->splitMerge($left);
+			$right = $this->splitMerge($right);
+
+			return $this->remergeArray($left,$right);
+		}
+	}
+
 	/**
 	 * @param $newRecords \Plugin\RecordSet|Array
 	 */
@@ -339,42 +426,8 @@ class RecordSet {
 
     protected function fetchDetails($columnName = "", $getIds = false) {
         /* @var $record \Plugin\Record */
-        if(count($this->getRecords()) == 0) return NULL;
 
-        $detailsArray = array();
-        $metaData = array();
-        if(!$this->detailsFetched) {
-            $whereString = "";
-            foreach($this->getRecords() as $record ) {
-                $whereString .= ($whereString == "" ? "" : " OR ")."(d.record = '".$record->getId()."' AND d.project_id = ".
-                    $record->getProjectObject()->getProjectId().")";
-                if (!isset($metaData[$record->getProjectObject()->getProjectId()])) {
-                    foreach ($record->getProjectObject()->getMetadata() as $fieldMeta) {
-                        $metaData[$record->getProjectObject()->getProjectId()][$fieldMeta->getFieldName()] = $fieldMeta->getElementType();
-                    }
-                }
-            }
-
-            $sql = "SELECT d.project_id, d.record, d.field_name, d.value
-					FROM redcap_data d
-					WHERE $whereString";
-
-            if(!$result = db_query($sql)) throw new Exception("Error looking up RecordSet details",self::SQL_ERROR);
-
-            while($row = db_fetch_assoc($result)) {
-                if (isset($metaData[$row['project_id']]) && $metaData[$row['project_id']][$row['field_name']] == "checkbox") {
-                    $detailsArray[$row['project_id']][$row["record"]][$row["field_name"]][] = $row["value"];
-                }
-                else {
-                    $detailsArray[$row['project_id']][$row["record"]][$row["field_name"]] = $row["value"];
-                }
-            }
-
-            foreach($this->fetchRecords() as $record) {
-                $record->setDetails($detailsArray[$record->getProjectObject()->getProjectId()][$record->getId()]);
-            }
-            $this->detailsFetched = true;
-        }
+		$this->fetchDetailsIfNot();
 
         $returnArray = array();
 
@@ -389,6 +442,46 @@ class RecordSet {
 
         return $returnArray;
     }
+
+	public function fetchDetailsIfNot() {
+		if(count($this->getRecords()) == 0) return NULL;
+
+		if(!$this->detailsFetched) {
+			$metaData = [];
+			$detailsArray = [];
+
+			$whereString = "";
+			foreach($this->getRecords() as $record ) {
+				$whereString .= ($whereString == "" ? "" : " OR ")."(d.record = '".$record->getId()."' AND d.project_id = ".
+						$record->getProjectObject()->getProjectId().")";
+				if (!isset($metaData[$record->getProjectObject()->getProjectId()])) {
+					foreach ($record->getProjectObject()->getMetadata() as $fieldMeta) {
+						$metaData[$record->getProjectObject()->getProjectId()][$fieldMeta->getFieldName()] = $fieldMeta->getElementType();
+					}
+				}
+			}
+
+			$sql = "SELECT d.project_id, d.record, d.field_name, d.value
+					FROM redcap_data d
+					WHERE $whereString";
+
+			if(!$result = db_query($sql)) throw new Exception("Error looking up RecordSet details". $sql,self::SQL_ERROR);
+
+			while($row = db_fetch_assoc($result)) {
+				if (isset($metaData[$row['project_id']]) && $metaData[$row['project_id']][$row['field_name']] == "checkbox") {
+					$detailsArray[$row['project_id']][$row["record"]][$row["field_name"]][] = $row["value"];
+				}
+				else {
+					$detailsArray[$row['project_id']][$row["record"]][$row["field_name"]] = $row["value"];
+				}
+			}
+
+			foreach($this->fetchRecords() as $record) {
+				$record->setDetails($detailsArray[$record->getProjectObject()->getProjectId()][$record->getId()]);
+			}
+			$this->detailsFetched = true;
+		}
+	}
 
 	/**
 	 * @param $keyName string
