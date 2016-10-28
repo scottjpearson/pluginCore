@@ -291,6 +291,7 @@ class Record {
 					"d$tableKey.project_id = " . $this->project->getProjectId() . "\n" .
 					($tableKey == 0 ? "" : "AND d$tableKey.record = d1.record\n") .
 					"AND d$tableKey.field_name = '$key'\n" .
+					"AND d$tableKey.event_id = ".$this->project->getEventId()."\n" .
 					"AND d$tableKey.value = '$value'";
 
 				$tableKey++;
