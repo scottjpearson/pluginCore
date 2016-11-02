@@ -20,6 +20,7 @@ class Record {
 	protected $details;
 	protected $keyValues;
 	protected $creationTs;
+	protected $tempDetails = [];
 
 	private $keys;
 
@@ -67,9 +68,14 @@ class Record {
 		### Allow array_search results to directly be input into getDetails
 		if($columnName === false) return "";
 
-		if($columnName == "") return $this->details;
+		if($columnName == "") {
+			return array_merge($this->tempDetails,$this->details);
+		}
 
-		return $this->details[$columnName];
+		if(array_key_exists($columnName,$this->details)) {
+			return $this->details[$columnName];
+		}
+		return $this->tempDetails[$columnName];
 	}
 
 	# Make changes to the record's values. Safely inserts values and logs any changes
@@ -204,6 +210,10 @@ class Record {
 		return $this;
 	}
 
+	public function addTempDetail($fieldName,$value) {
+		$this->tempDetails[$fieldName] = $value;
+	}
+
 	# Stub function for handling data triggers on particular projects
 	public function trigger() {
 
@@ -281,6 +291,7 @@ class Record {
 					"d$tableKey.project_id = " . $this->project->getProjectId() . "\n" .
 					($tableKey == 0 ? "" : "AND d$tableKey.record = d1.record\n") .
 					"AND d$tableKey.field_name = '$key'\n" .
+					"AND d$tableKey.event_id = ".$this->project->getEventId()."\n" .
 					"AND d$tableKey.value = '$value'";
 
 				$tableKey++;
