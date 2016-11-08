@@ -11,12 +11,12 @@ $Core->Helpers(array("createArrayFromCSV"));
  * @param $filepath, the path where the file is
  * @return array, the generated array with the data
  */
-function parseCSVtoArray($dbTable,$fileExtension, $DocID, $filepath){
-    $sqlTableCSV = "SELECT * FROM `".$dbTable."` WHERE file_extension = '".$fileExtension."' AND doc_id = '".$DocID."'";
+function parseCSVtoArray($DocID){
+    $sqlTableCSV = "SELECT * FROM `redcap_edocs_metadata` WHERE doc_id = '".$DocID."'";
     $qTableCSV = db_query($sqlTableCSV);
     $csv = array();
     while ($rowTableCSV = db_fetch_assoc($qTableCSV)) {
-        $csv = createArrayFromCSV($filepath,$rowTableCSV['stored_name']);
+        $csv = createArrayFromCSV(EDOC_PATH,$rowTableCSV['stored_name']);
     }
     return $csv;
 }
