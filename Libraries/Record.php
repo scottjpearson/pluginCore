@@ -411,6 +411,28 @@ class Record {
 		}
 	}
 
+	# Determines whether or not the survey is complete (currently only for projects that only have one survey).
+	public function isSurveyComplete() {
+        $project = self::getProjectObject();
+        $surveyNames = $project->getSurveyList();
+
+        if(count($surveyNames) == 0){
+            throw new Exception("There are no surveys on project {$project->getProjectId()}!" );
+        }
+        else if(count($surveyNames) > 1){
+            throw new Exception("We do not currently support projects with more than one survey because"
+                . " it is difficult to determine when the sequence of surveys is complete in those cases."
+                . "  We could implement this, but we would likely have to take into account the survey queue, arms,"
+                . " the 'Auto-continue to next survey' checkbox, and possibly other features that affect survey order.");
+        }
+
+        return self::isFormComplete($surveyNames[0]);
+    }
+
+    public function isFormComplete($formName) {
+        return self::getDetails("{$formName}_complete") == 2;
+    }
+
     /**
      * Function that checks if a record exists in any of the other projects (PRE, BRIDGE, POST) and returns the page and projectID in a string
      * @param $recordID, the ID of the current record

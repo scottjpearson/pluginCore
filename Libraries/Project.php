@@ -2,7 +2,7 @@
 /** Author: Kyle McGuffin */
 namespace Plugin;
 
-$GLOBALS["Core"]->Libraries(array("Record","Core","MetadataCollection"),false);
+$GLOBALS["Core"]->Libraries(array("Record","Core","MetadataCollection","Database"),false);
 
 use \Exception;
 
@@ -87,6 +87,26 @@ class Project {
 
 		return $this->formList;
 	}
+
+	public function getSurveyList() {
+        $projectId = db_real_escape_string(self::getProjectId());
+        $formNamesSql = Database::arrayToValueListSQL(self::getFormList());
+
+        $sql = "SELECT form_name
+                FROM redcap_surveys
+                WHERE
+                  project_id = '$projectId'
+                  AND form_name in $formNamesSql";
+
+        $result = Database::query($sql);
+
+        $surveyNames = array();
+        while($row = db_fetch_assoc($result)){
+            $surveyNames[] = $row['form_name'];
+        }
+
+        return $surveyNames;
+    }
 
 	# Check the metadata to determine if a field is a checkbox
 	public function isCheckbox($fieldName) {
