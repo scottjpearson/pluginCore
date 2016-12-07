@@ -17,6 +17,7 @@ class Project {
 	private $projectName;
 	private $projectId;
 	private $eventId;
+	private $dagList;
 	protected $metadata;
 	protected $fieldList;
 	protected $formList;
@@ -391,24 +392,26 @@ class Project {
 
 	public function getGroupName($groupId)
 	{
-		# Prevent SQL Injection
-		$groupId = intval($groupId);
+		return $this->getDagList()[$groupId];
+	}
 
-		$pid = $this->projectId;
-		$sql = "SELECT group_name
-				FROM redcap_data_access_groups
-				WHERE
-					project_id = $pid
-					and group_id = $groupId";
+	public function getDagList()
+	{
+		if(!isset($this->dagList)) {
+			$pid = $this->projectId;
+			$sql = "SELECT group_name, group_id
+					FROM redcap_data_access_groups
+					WHERE project_id = $pid";
 
-		$result = db_query($sql);
+			$result = db_query($sql);
 
-		if(!$result){
-			return null;
+			$this->dagList = [];
+
+			while($row = db_fetch_assoc($result)) {
+				$this->dagList[$row['group_id']] = $row['group_name'];
+			}
 		}
-
-		$row = db_fetch_assoc($result);
-		return $row['group_name'];
+		return $this->dagList;
 	}
 
 	/*
