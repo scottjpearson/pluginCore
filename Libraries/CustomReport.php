@@ -56,7 +56,7 @@ class CustomReport
         return $this->isType($fieldName, array(self::TYPE_YESNO, self::TYPE_SELECT, self::TYPE_RADIO, self::TYPE_CHECKBOX));
     }
 
-    function isType($fieldName, $typeConstants)
+    function isType($fieldName, $typeConstantOrConstants)
     {
         if(!is_array($typeConstants)){
             $typeConstants = array($typeConstants);
