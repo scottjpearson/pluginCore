@@ -58,12 +58,12 @@ class CustomReport
 
     function isType($fieldName, $typeConstantOrConstants)
     {
-        if(!is_array($typeConstants)){
-            $typeConstants = array($typeConstants);
+        if(!is_array($typeConstantOrConstants)){
+			$typeConstantOrConstants = array($typeConstantOrConstants);
         }
 
         $metadata = $this->getMetadata($fieldName);
-        return in_array($metadata->getElementType(), $typeConstants);
+        return in_array($metadata->getElementType(), $typeConstantOrConstants);
     }
 
 	function getChoices($fieldName)
