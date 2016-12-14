@@ -53,13 +53,17 @@ class CustomReport
 
     function isChoiceType($fieldName)
     {
-        $metadata = $this->getMetadata($fieldName);
-        return in_array($metadata->getElementType(), array(self::TYPE_YESNO, self::TYPE_SELECT, self::TYPE_RADIO));
+        return $this->isType($fieldName, array(self::TYPE_YESNO, self::TYPE_SELECT, self::TYPE_RADIO, self::TYPE_CHECKBOX));
     }
 
-    function isType($fieldName, $typeConstant)
+    function isType($fieldName, $typeConstants)
     {
-        return $this->getMetadata($fieldName)->getElementType() == $typeConstant;
+        if(!is_array($typeConstants)){
+            $typeConstants = array($typeConstants);
+        }
+
+        $metadata = $this->getMetadata($fieldName);
+        return in_array($metadata->getElementType(), $typeConstants);
     }
 
 	function getChoices($fieldName)
