@@ -62,11 +62,16 @@ class LdapLookup {
 		return self::lookupUserDetailsByKey($personId,self::PERSON_ID_KEY);
 	}
 
-	public static function lookupUsersByNameFragment($nameFragment) {
+	public static function lookupUsersByNameFragment($nameFragment, $startsWith = true) {
 		self::initialize();
 
+                $wildcard = "*";
+                if ($startsWith) {
+                    $wildcard = "";
+                }
+
 		## Search LDAP for any user matching the $nameFragment on vunet, surname or givenname
-		$sr = ldap_search(self::$ldapConn, "ou=people,dc=vanderbilt,dc=edu", "(|(uid=$nameFragment*)(sn=$nameFragment*)(givenname=$nameFragment*))");
+		$sr = ldap_search(self::$ldapConn, "ou=people,dc=vanderbilt,dc=edu", "(|(uid=$wildcard$nameFragment*)(sn=$wildcard$nameFragment*)(givenname=$wildcard$nameFragment*))");
 
 		if ($sr) {
 			$data = ldap_get_entries(self::$ldapConn, $sr);
